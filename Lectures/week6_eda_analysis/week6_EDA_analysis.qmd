@@ -33,7 +33,7 @@ Whether dealing with categorical, numeric, time-series, geographic, or textual/n
 Explore this table to discern the most suitable visualization approach for your data type and analytical objectives, empowering you to convey compelling narratives and glean actionable insights from your datasets.
 
 | Data Type       | Visual Tool                   | Description                                                   | ggplot Formula                                                                          |
-|----------------|----------------|-----------------|-----------------------|
+|-----------------|-------------------------------|---------------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | Categorical     | Bar Plot                      | Displays the frequency or count of each category.             | `ggplot(data, aes(x = categorical_variable)) + geom_bar()`                              |
 | Categorical     | Pie Chart                     | Shows the proportions or percentages of each category.        | `ggplot(data, aes(x = factor(1), fill = categorical_variable)) + geom_bar()`            |
 | Categorical     | Stacked Bar Plot              | Compares the distribution of subcategories within categories. | `ggplot(data, aes(x = categorical_variable, fill = subcategory_variable)) + geom_bar()` |
