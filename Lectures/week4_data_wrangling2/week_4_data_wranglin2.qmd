@@ -1,0 +1,130 @@
+---
+title: "week4"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: true
+  output: asis
+df-print: kable
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+# loaded packages
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(mdsr)
+library(mosaicData)
+library(fec16)
+library(nycflights13)
+
+here <- here::here()
+dpath <- "data"
+```
+
+It’s rare that a data analysis involves only a single table of data. Typically you have many tables of data, and you must combine them to answer the questions that you’re interested in. Collectively, multiple tables of data are called **relational data** because it is the relations, not just the individual datasets, that are important.
+
+To work with relational data you need verbs that work with pairs of tables:
+
+![Joining tables – Introduction to R/tidyverse for Exploratory Data Analysis](https://th.bing.com/th/id/OIP.lK9ChE5bnIcwBve9HvoMOwAAAA?rs=1&pid=ImgDetMain)
+
+## Examples
+
+We will explore relational data from `nycflights13` using the two-table verbs from dplyr.
+
+![](images/clipboard-1313704162.png)
+
+Thus, for nycflights13:
+
+-   `flights` connects to `planes` via a single variable, `tailnum`.
+
+-   `flights` connects to `airlines` through the `carrier` variable.
+
+-   `flights` connects to `airports` in two ways: via the `origin` and `dest` variables.
+
+-   `flights` connects to `weather` via `origin` (the location), and `year`, `month`, `day` and `hour` (the time).
+
+## **`inner_join()`**
+
+If we examine the first few rows of the `flights` table, we observe that the `carrier` column contains a two-character string corresponding to the airline.
+
+```{r}
+glimpse(flights)
+```
+
+In the `airlines` table, we have those same two-character strings, but also the full names of the airline.
+
+```{r}
+head(airlines)
+```
+
+In order to retrieve a list of flights and the full names of the airlines that managed each flight, we need to match up the rows in the `flights` table with those rows in the `airlines` table that have the corresponding values for the `carrier` column in *both* tables. This is achieved with the function `inner_join()`.
+
+```{r}
+flights_joined <- flights |> 
+  inner_join(airlines, by= c("carrier"="carrier"))
+glimpse(flights_joined)
+```
+
+Notice that the `flights_joined` data frame now has an additional variable called `name`. This is the column from `airlines` that is now included in the combined data frame. We can view the full names of the airlines instead of the cryptic two-character codes.
+
+```{r}
+flights_joined |> 
+  select(carrier, name, flight, origin, dest) |> 
+  head(3)
+```
+
+## Outer Joins
+
+An inner join keeps observations that appear in both tables. An **outer join** keeps observations that appear in at least one of the tables. There are three types of outer joins:
+
+-   A **left join** keeps all observations in `x`.
+
+-   A **right join** keeps all observations in `y`.
+
+-   A **full join** keeps all observations in `x` and `y`.
+
+### left_Joins()
+
+the flights and weather tables match on their common variables: `year`, `month`, `day`, `hour` and `origin`
+
+```{r}
+flights_joined |> 
+  left_join(weather)
+```
+
+```{r}
+flights_joined |> 
+  left_join(planes, by="tailnum")
+```
+
+## Filtering Joins
+
+Filtering joins match observations in the same way as mutating joins, but affect the observations, not the variables. There are two types:
+
+-   `semi_join(x, y)` **keeps** all observations in `x` that have a match in `y`.
+
+-   `anti_join(x, y)` **drops** all observations in `x` that have a match in `y`.
+
+Semi-joins are useful for matching filtered summary tables back to the original rows. For example, imagine you’ve found the top ten most popular destinations:
+
+```{r}
+top_dest <- flights |> 
+  count(dest, sort=TRUE) |> 
+  head(10)
+```
+
+```{r}
+flights_joined |> 
+  semi_join(top_dest)
+```
+
+The inverse of a semi-join is an anti-join. An anti-join keeps the rows that *don’t* have a match. Anti-joins are useful for diagnosing join mismatches. For example, when connecting `flights` and `planes`, you might be interested to know that there are many `flights` that don’t have a match in `planes`:
+
+```{r}
+flights |> 
+  anti_join(planes, by = "tailnum") |> 
+  count(tailnum, sort = TRUE)
+```

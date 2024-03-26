@@ -1,0 +1,144 @@
+---
+title: "week4_2"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: true
+  output: asis
+df-print: kable
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+# loaded packages
+library(here)
+library(tidyverse)
+library(mdsr)
+
+here <- here::here()
+dpath <- "data"
+```
+
+# **Data import**
+
+```{r}
+students <- read_csv("https://pos.it/r4ds-students-csv")
+```
+
+::: callout-note
+💡 A very hany approach is to use [`janitor::clean_names()`](https://sfirke.github.io/janitor/reference/clean_names.html) to use some heuristics to turn them all into snake case at once
+:::
+
+```{r}
+students |> 
+  janitor::clean_names()
+```
+
+## **Writing to a file**
+
+```{r}
+write_csv(students, "students.csv")
+```
+
+# Data Tidying
+
+Data tidying refers to a consistent way to organize the data in R using a system called **tidy data**. Getting your data into this format requires some work up front, but that work pays off in the long term. Once you have tidy data and the tidy tools provided by packages in the tidyverse, you will spend much less time munging data from one representation to another, allowing you to spend more time on the data questions you care about.
+
+There are three interrelated rules that make a dataset tidy:
+
+1.  Each variable is a column; each column is a variable.
+
+2.  Each observation is a row; each row is an observation.
+
+3.  Each value is a cell; each cell is a single value.
+
+![This means that most real analyses will require at least a little tidying. You’ll begin by figuring out what the underlying variables and observations are. Sometimes this is easy; other times you’ll need to consult with the people who originally generated the data. Next, you’ll **pivot** your data into a tidy form, with variables in the columns and observations in the rows.](images/clipboard-531200679.png)
+
+tidyr provides two functions for pivoting data: [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html) and [`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html). We’ll first start with [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html) because it’s the most common case. Let’s dive into some examples.
+
+## Pivot_longer()
+
+The `billboard` dataset records the billboard rank of songs in the year 2000:
+
+```{r}
+billboard
+```
+
+In this dataset, each observation is a song. The first three columns (`artist`, `track` and `date.entered`) are variables that describe the song. Then we have 76 columns (`wk1`-`wk76`) that describe the rank of the song in each week^[1](https://r4ds.hadley.nz/data-tidy#fn1)^. Here, the column names are one variable (the `week`) and the cell values are another (the `rank`).
+
+To tidy this data, we’ll use [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html):
+
+```{r}
+billboard |> 
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank",
+    values_drop_na = TRUE
+  )
+```
+
+After the data, there are three key arguments:
+
+-   `cols` specifies which columns need to be pivoted, i.e. which columns aren’t variables. This argument uses the same syntax as [`select()`](https://dplyr.tidyverse.org/reference/select.html) so here we could use `!c(artist, track, date.entered)` or `starts_with("wk")`.
+
+-   `names_to` names the variable stored in the column names, we named that variable `week`.
+
+-   `values_to` names the variable stored in the cell values, we named that variable `rank`.
+
+-   values_drop_na: TRUE refers to the rows with `NA`s were dropped.
+
+👋 Note that in the code `"week"` and `"rank"` are quoted because those are new variables we’re creating, they don’t yet exist in the data when we run the [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html) call.
+
+### Another Example
+
+A more challenging situation occurs when you have multiple pieces of information crammed into the column names, and you would like to store these in separate new variables. For example, take the `who2` dataset, the source of `table1` and friends that you saw above:
+
+```{r}
+who2
+```
+
+This dataset, collected by the World Health Organisation, records information about tuberculosis diagnoses. There are two columns that are already variables and are easy to interpret: `country` and `year`. They are followed by 56 columns like `sp_m_014`, `ep_m_4554`, and `rel_m_3544`. If you stare at these columns for long enough, you’ll notice there’s a pattern. Each column name is made up of three pieces separated by `_`. The first piece, `sp`/`rel`/`ep`, describes the method used for the diagnosis, the second piece, `m`/`f` is the `gender` (coded as a binary variable in this dataset), and the third piece, `014`/`1524`/`2534`/`3544`/`4554`/`5564`/`65` is the `age` range (`014` represents 0-14, for example).
+
+So in this case we have six pieces of information recorded in `who2`: the country and the year (already columns); the method of diagnosis, the gender category, and the age range category (contained in the other column names); and the count of patients in that category (cell values). To organize these six pieces of information in six separate columns, we use [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html) with a vector of column names for `names_to` and instructors for splitting the original variable names into pieces for `names_sep` as well as a column name for `values_to`:
+
+```{r}
+who2 |> 
+  pivot_longer(
+    cols = !(country:year),
+    names_to = c("diagnosis", "gender", "age"),
+    names_sep = "_",
+    values_to = "count"
+  )
+```
+
+## Pivot_wider()
+
+So far we’ve used [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html) to solve the common class of problems where values have ended up in column names. Next we’ll pivot (HA HA) to [`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html), which makes datasets **wider** by increasing columns and reducing rows and helps when one observation is spread across multiple rows. This seems to arise less commonly in the wild, but it does seem to crop up a lot when dealing with governmental data.
+
+We’ll start by looking at `cms_patient_experience`, a dataset from the Centers of Medicare and Medicaid services that collects data about patient experiences:
+
+```{r}
+cms_patient_experience
+```
+
+The core unit being studied is an organization, but each organization is spread across six rows, with one row for each measurement taken in the survey organization. We can see the complete set of values for `measure_cd` and `measure_title` by using [`distinct()`](https://dplyr.tidyverse.org/reference/distinct.html):
+
+```{r}
+cms_patient_experience |> 
+  distinct(measure_cd, measure_title)
+```
+
+Neither of these columns will make particularly great variable names: `measure_cd` doesn’t hint at the meaning of the variable and `measure_title` is a long sentence containing spaces. We’ll use `measure_cd` as the source for our new column names for now, but in a real analysis you might want to create your own variable names that are both short and meaningful.
+
+[`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html) has the opposite interface to [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html): instead of choosing new column names, we need to provide the existing columns that define the values (`values_from`) and the column name (`names_from)`:
+
+```{r}
+cms_patient_experience |> 
+  pivot_wider(
+    id_cols = starts_with("org"),
+    names_from = measure_cd,
+    values_from = prf_rate
+  )
+```

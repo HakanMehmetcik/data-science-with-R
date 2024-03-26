@@ -1,0 +1,435 @@
+---
+title: "week3"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: true
+  output: asis
+df-print: kable
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+# loaded packages
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(mdsr)
+library(mosaicData)
+library(fec16)
+library(nycflights13)
+
+here <- here::here()
+dpath <- "data"
+```
+
+## A grammar for data wrangling
+
+In much the same way that ggplot2 presents a grammar for data graphics, the dplyr package presents a grammar for data wrangling.
+
+::: callout-note
+**💡 dplyr** has five [*verbs*](https://en.wikipedia.org/w/index.php?search=verbs) for working with data in a data frame:
+
+-   `select()`: take a subset of the columns (i.e., features, variables)
+
+-   `filter()`: take a subset of the rows (i.e., observations)
+
+-   `mutate()`: add or modify existing columns
+
+-   `arrange()`: sort the rows
+
+-   `summarize()`: aggregate the data across rows (e.g., group it according to some criteria)
+
+Overall, being able to combine these verbs with nouns (i.e., data frames) and adverbs (i.e., arguments) creates a flexible and powerful way to wrangle data!
+:::
+
+### select() and filter()
+
+The two simplest of the five verbs are filter() and select(), which return a subset of the rows or columns of a data frame, respectively.
+
+```{r}
+presidential |> 
+  select(name, party)
+  
+```
+
+```{r}
+presidential |> 
+  filter(party=="Republican")
+```
+
+how about using both select and filter together
+
+```{r}
+presidential |> 
+  select(name, party) |> 
+  filter(party=="Republican") 
+
+```
+
+Combining the `filter()` and `select()` commands enables one to drill down to very specific pieces of information. For example, we can find which Democratic presidents served since [*Watergate*](https://en.wikipedia.org/w/index.php?search=Watergate).
+
+```{r}
+presidential |> 
+  filter(year(start) > 1973 & party == "Democratic") |> 
+  select(name)
+```
+
+### **`mutate()` and `rename()`**
+
+Frequently, in the process of conducting our analysis, we will create, re-define, and rename some of our variables. The functions `mutate()` and `rename()` provide these capabilities.
+
+While we have the raw data on when each of these presidents took and relinquished office, we don’t actually have a numeric variable giving the length of each president’s term. Of course, we can derive this information from the dates given, and add the result as a new column to our data frame. This date arithmetic is made easier through the use of the lubridate package (now included as part of the tidyverse), which we use to compute the number of years (dyears()) that elapsed since during the interval() from the start until the end of each president’s term.
+
+In this situation, it is generally considered good style to create a new object rather than clobbering the one that comes from an external source. To preserve the existing presidential data frame, we save the result of mutate() as a new object called my_presidents.
+
+```{r}
+my_presidents <- presidential |>
+  mutate(term.length = interval(start, end) / dyears(1))
+my_presidents
+```
+
+The mutate() function can also be used to modify the data in an existing column. Suppose that we wanted to add to our data frame a variable containing the year in which each president was elected. Our first (naïve) attempt might assume that every president was elected in the year before he took office. Note that mutate() returns a data frame, so if we want to modify our existing data frame, we need to overwrite it with the results.
+
+```{r}
+my_presidents <- my_presidents |>
+  mutate(elected = year(start) - 1)
+my_presidents
+```
+
+Some entries in this data set are wrong, because presidential elections are only held every four years. Lyndon Johnson assumed the office after President John Kennedy was assassinated in 1963, and Gerald Ford took over after President Richard Nixon resigned in 1974. Thus, there were no presidential elections in 1962 or 1973, as suggested in our data frame. We should overwrite these values with NA’s—which is how R denotes missing values. We can use the ifelse() function to do this. Here, if the value of elected is either 1962 or 1973, we overwrite that value with NA.1 Otherwise, we overwrite it with the same value that it currently has. In this case, instead of checking to see whether the value of elected equals 1962 or 1973, for brevity we can use the %in% operator to check to see whether the value of elected belongs to the vector consisting of 1962 and 1973.
+
+```{r}
+my_presidents <- my_presidents |>
+  mutate(elected = ifelse(elected %in% c(1962, 1973), NA, elected))
+my_presidents
+```
+
+Finally, it is considered bad practice to use periods in the name of functions, data frames, and variables in R. Ill-advised periods could conflict with R’s use of generic functions (i.e., R’s mechanism for method overloading). Thus, we should change the name of the term.length column that we created earlier. We can achieve this using the rename() function. In this book, we will use snake_case for function and variable names.
+
+::: callout-note
+💡 Don’t use periods in the names of functions, data frames, or variables, as this can be confused with the object-oriented programming model.
+:::
+
+```{r}
+my_presidents <- my_presidents |>
+  rename(term_length = term.length)
+my_presidents
+```
+
+### **`arrange()`**
+
+The function `sort()` will sort a vector but not a data frame. The `arrange()` function sorts a data frame. In order to use `arrange()` on a data frame, you have to specify the data frame, and the column by which you want it to be sorted. You also have to specify the direction in which you want it to be sorted. Specifying multiple sort conditions will help break ties. To sort our `presidential` data frame by the length of each president’s term, we specify that we want the column `term_length` in descending order.
+
+```{r}
+my_presidents |>
+  arrange(desc(term_length))
+```
+
+A number of presidents completed either one or two full terms, and thus have the exact same term length (4 or 8 years, respectively). To break these ties, we can further sort by `party` and `elected`.
+
+```{r}
+my_presidents |>
+  arrange(desc(term_length), party, elected)
+```
+
+### **`summarize()` with `group_by()`**
+
+Our last of the five verbs for single-table analysis is summarize(), which is nearly always used in conjunction with group_by(). The previous four verbs provided us with means to manipulate a data frame in powerful and flexible ways. But the extent of the analysis we can perform with these four verbs alone is limited. On the other hand, summarize() with group_by() enables us to make comparisons.
+
+```{r}
+my_presidents |>
+  summarize(
+    N = n(), 
+    first_year = min(year(start)), 
+    last_year = max(year(end)), 
+    num_dems = sum(party == "Democratic"), 
+    years = sum(term_length), 
+    avg_term_length = mean(term_length)
+  )
+```
+
+The next two variables determine the first year that one of these presidents assumed office. This is the smallest year in the start column. Similarly, the most recent year is the largest year in the end column. The variable num_dems simply counts the number of rows in which the value of the party variable was Democratic. Finally, the last two variables compute the sum and average of the term_length variable. We see that 5 of the 12 presidents who served from 1953 to 2021 were Democrats, and the average term length over these 68 years was about 5.6 years.
+
+```{r}
+my_presidents |>
+  group_by(party) |>
+  summarize(
+    N = n(), 
+    first_year = min(year(start)), 
+    last_year = max(year(end)), 
+    num_dems = sum(party == "Democratic"), 
+    years = sum(term_length), 
+    avg_term_length = mean(term_length)
+  )
+```
+
+## Exercise
+
+To explore the basic data manipulation verbs of dplyr, we’ll use nycflights13::flights. This data frame contains all 336,776 flights that departed from New York City in 2013. The data comes from the US Bureau of Transportation Statistics, and is documented in ?flights.
+
+### Filter Rows with filter()
+
+```{r}
+head(flights)
+```
+
+```{r}
+jan1 <- flights |> 
+  filter(month == 1, day == 1)
+head(jan1)
+```
+
+::: callout-note
+Complete set of Boolean operators:
+
+![](images/clipboard-3928272227.png)
+:::
+
+The following code finds all flights that departed in November or December:
+
+```{r}
+flights |> 
+  filter(month == 11 | month == 12) |> 
+  head()
+```
+
+::: callout-note
+A useful short-hand for this problem is `x %in% y`. This will select every row where `x` is one of the values in `y`. We could use it to rewrite the code above:
+:::
+
+```{r}
+nov_dec <- filter(flights, month %in% c(11, 12))
+```
+
+Sometimes you can simplify complicated subsetting by remembering De Morgan’s law: `!(x & y)` is the same as `!x | !y`, and `!(x | y)` is the same as `!x & !y`. For example, if you wanted to find flights that weren’t delayed (on arrival or departure) by more than two hours, you could use either of the following two filters.
+
+```{r}
+flights |> 
+  filter((arr_delay > 120 | dep_delay > 120))
+flights |> 
+  filter(arr_delay <= 120, dep_delay <= 120)
+```
+
+::: callout-note
+⚠️ [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) only includes rows where the condition is `TRUE`; it excludes both `FALSE` and `NA` values. If you want to preserve missing values, ask for them explicitly!
+:::
+
+#### **More exercises for filter()**
+
+1.  Find all flights that
+
+    1.  Had an arrival delay of two or more hours
+
+    2.  Flew to Houston (`IAH` or `HOU`)
+
+    3.  Were operated by United, American, or Delta
+
+    4.  Departed in summer (July, August, and September)
+
+    5.  Arrived more than two hours late, but didn’t leave late
+
+    6.  Were delayed by at least an hour, but made up over 30 minutes in flight
+
+    7.  Departed between midnight and 6am (inclusive)
+
+2.  Another useful dplyr filtering helper is [`between()`](https://dplyr.tidyverse.org/reference/between.html). What does it do? Can you use it to simplify the code needed to answer the previous challenges?
+
+3.  How many flights have a missing `dep_time`? What other variables are missing? What might these rows represent?
+
+4.  Why is `NA ^ 0` not missing? Why is `NA | TRUE` not missing? Why is `FALSE & NA` not missing? Can you figure out the general rule? (`NA * 0` is a tricky counterexample!)
+
+### Arrange rows with arrange()
+
+[`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) works similarly to [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) except that instead of selecting rows, it changes their order. It takes a data frame and a set of column names (or more complicated expressions) to order by.
+
+```{r}
+flights |> 
+  arrange(year, month, day) |> 
+  head()
+```
+
+Use [`desc()`](https://dplyr.tidyverse.org/reference/desc.html) to re-order by a column in descending order:
+
+```{r}
+flights |> 
+  arrange(desc(dep_delay)) |> 
+  head()
+```
+
+::: callout-note
+👋 Missing values are always sorted at the end!
+:::
+
+#### **More exercises for arrange**
+
+1.  How could you use [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) to sort all missing values to the start? (Hint: use [`is.na()`](https://rdrr.io/r/base/NA.html)).
+
+2.  Sort `flights` to find the most delayed flights. Find the flights that left earliest.
+
+3.  Sort `flights` to find the fastest (highest speed) flights.
+
+4.  Which flights travelled the farthest? Which travelled the shortest?
+
+### **Select columns with `select()`**
+
+t’s not uncommon to get datasets with hundreds or even thousands of variables. In this case, the first challenge is often narrowing in on the variables you’re actually interested in. [`select()`](https://dplyr.tidyverse.org/reference/select.html) allows you to rapidly zoom in on a useful subset using operations based on the names of the variables.
+
+```{r}
+flights |> 
+  select(year, month, day) |> 
+  head()
+```
+
+There are a number of helper functions you can use within [`select()`](https://dplyr.tidyverse.org/reference/select.html):
+
+-   `starts_with("abc")`: matches names that begin with “abc”.
+
+-   `ends_with("xyz")`: matches names that end with “xyz”.
+
+-   `contains("ijk")`: matches names that contain “ijk”.
+
+-   `matches("(.)\\1")`: selects variables that match a regular expression. This one matches any variables that contain repeated characters. You’ll learn more about regular expressions in [strings](https://r4ds.had.co.nz/strings.html#strings).
+
+-   `num_range("x", 1:3)`: matches `x1`, `x2` and `x3`.
+
+See [`?select`](https://dplyr.tidyverse.org/reference/select.html) for more details.
+
+::: callout-note
+👋 [`select()`](https://dplyr.tidyverse.org/reference/select.html) can be used to rename variables, but it’s rarely useful because it drops all of the variables not explicitly mentioned. Instead, use [`rename()`](https://dplyr.tidyverse.org/reference/rename.html), which is a variant of [`select()`](https://dplyr.tidyverse.org/reference/select.html) that keeps all the variables that aren’t explicitly mentioned
+:::
+
+```{r}
+flights |> 
+  rename(tail_num = tailnum) |> 
+  head()
+```
+
+::: callout-note
+Another option is to use [`select()`](https://dplyr.tidyverse.org/reference/select.html) in conjunction with the [`everything()`](https://tidyselect.r-lib.org/reference/everything.html) helper. This is useful if you have a handful of variables you’d like to move to the start of the data frame.
+:::
+
+```{r}
+flights |> 
+  select(time_hour, air_time, everything()) |> 
+  head()
+```
+
+#### More **exercises for select()**
+
+1.  Brainstorm as many ways as possible to select `dep_time`, `dep_delay`, `arr_time`, and `arr_delay` from `flights`.
+
+2.  What happens if you include the name of a variable multiple times in a [`select()`](https://dplyr.tidyverse.org/reference/select.html) call?
+
+3.  What does the [`any_of()`](https://tidyselect.r-lib.org/reference/all_of.html) function do? Why might it be helpful in conjunction with this vector?
+
+    ```         
+    vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+    ```
+
+4.  Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?
+
+    ```         
+    select(flights, contains("TIME"))
+    ```
+
+### Add new variables with mutate()
+
+[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) always adds new columns at the end of your dataset so we’ll start by creating a narrower dataset so we can see the new variables.
+
+```{r}
+flights |> 
+  mutate(
+    gain = dep_delay - arr_time,
+    hours = air_time /60,
+    gain_per_hour = gain/hours
+  )|> 
+  head()
+```
+
+```{r}
+flights_sml <- flights |> 
+  select(year:day, 
+         ends_with("delay"),
+         distance,
+         air_time, 
+         arr_time,
+         dep_time) |> 
+  mutate(
+    gain = dep_delay - arr_time,
+    hours = air_time /60,
+    gain_per_hour = gain/hours
+  ) |> 
+  arrange(desc(gain_per_hour)) |> 
+  select(gain_per_hour, everything()) |> 
+  filter(gain_per_hour > 400)
+
+flights_sml
+
+```
+
+If you only want to keep the new variables, use [`transmute()`](https://dplyr.tidyverse.org/reference/transmute.html):
+
+```{r}
+flights |> 
+  transmute(
+  gain = dep_delay - arr_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours)|> 
+  head()
+```
+
+#### More exercises for mutate
+
+1.  Currently `dep_time` and `sched_dep_time` are convenient to look at, but hard to compute with because they’re not really continuous numbers. Convert them to a more convenient representation of number of minutes since midnight.
+
+2.  Compare `air_time` with `arr_time - dep_time`. What do you expect to see? What do you see? What do you need to do to fix it?
+
+3.  Compare `dep_time`, `sched_dep_time`, and `dep_delay`. How would you expect those three numbers to be related?
+
+4.  Find the 10 most delayed flights using a ranking function. How do you want to handle ties? Carefully read the documentation for [`min_rank()`](https://dplyr.tidyverse.org/reference/row_number.html).
+
+5.  What does `1:3 + 1:10` return? Why?
+
+6.  What trigonometric functions does R provide?
+
+### Grouped summaries with summarise()
+
+The last key verb is [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html). It collapses a data frame to a single row:
+
+```{r}
+flights |> 
+  summarise(delay=mean(dep_delay, na.rm = TRUE))
+```
+
+[`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html) is not terribly useful unless we pair it with [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html). This changes the unit of analysis from the complete dataset to individual groups.
+
+```{r}
+flights |> 
+  group_by(year, month, day) |> 
+  summarise(delay = mean(dep_delay, na.rm = T))|> 
+  head()
+```
+
+### **Combining multiple operations**
+
+Imagine that we want to explore the relationship between the distance and average delay for each location. Using what you know about dplyr, you might write code like this:
+
+```{r}
+flights %>% 
+  group_by(dest) %>% 
+  summarise(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  filter(count > 20, dest != "HNL") |>  
+  ggplot(aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+# It looks like delays increase with distance up to ~750 miles 
+# and then decrease. Maybe as flights get longer there's more 
+# ability to make up delays in the air?
+```
