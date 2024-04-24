@@ -1,0 +1,614 @@
+---
+title: "Functions and Models"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+---
+
+# Functions and Models
+
+## Functions
+
+A function: You take some kind of input and you get some kind of output!
+
+The hint here is that you can get ONE specific output from any specific input.
+
+Ex: **A national park contains foxes that prey on rabbits.  The table below gives the two populations, F and R, over an 11-month period, where t=0 means January, t=1 means February, and so on.**
+
+Sure, here is the table in R markdown format:
+
+| Month | Rabbits | Foxes |
+|-------|---------|-------|
+| 0     | 1,000   | 150   |
+| 1     | 750     | 143   |
+| 2     | 567     | 125   |
+| 3     | 500     | 100   |
+| 4     | 567     | 75    |
+| 5     | 750     | 57    |
+| 6     | 1,000   | 50    |
+| 7     | 1,250   | 57    |
+| 8     | 1,433   | 75    |
+| 9     | 1,500   | 100   |
+| 10    | 1,433   | 125   |
+
+This table shows the number of rabbits and foxes over a period of 10 months. The 'Rabbits' and 'Foxes' columns represent the population of each species at the end of each month.
+
+1.  Is F a function of t?
+
+Yes, because for each value of t, there is axactly one value of F.
+
+2.  Is R a function of F? 
+
+No, beacuse when F=57 R=750 or R=1250.
+
+::: callout-note
+💡 A function is generally denoted by f(x) where x is the input. For example, in the function f(x) = x\^2, the function f(x) takes the value of "x" and then squares it!
+:::
+
+## Distributions
+
+In statistics, **a distribution is a function that shows the possible values for a variable and how often they occur**. It's a description of the relative numbers of times each possible outcome will occur in a number of trials. Distributions can be represented in various ways, such as with graphs or probability tables. Knowing the types of distributions is important for several reasons:
+
+1.  **Understanding Data**: Different types of distributions can help us understand the characteristics of our data. For example, **a normal distribution might indicate that our data is symmetrically distributed around the mean**, while a skewed distribution might indicate that our data has a tendency to lean towards one side.
+
+2.  **Making Predictions**: Distributions can help us make predictions about future data points. For example, if we know that a certain variable follows a normal distribution, we can predict the probability of future outcomes within a certain range.
+
+3.  **Statistical Testing**: Many statistical tests assume that the data follows a certain distribution. Knowing the distribution of your data can help you choose the right statistical test and avoid incorrect conclusions.
+
+4.  **Sampling**: Sampling distributions are important for statistics because we need to collect the sample and estimate the parameters of the population distribution. Hence distribution is necessary to make inferences about the overall population.
+
+5.  **Identifying Anomalies**: Understanding the expected distribution of data can help identify anomalies or outliers. For example, in a normal distribution, data points that fall far from the mean may be considered outliers.
+
+6.  **Modeling**: Probability distributions are used in various fields such as finance, insurance, and natural sciences for modeling random variables.
+
+7.  **Decision Making**: Statistical knowledge helps you use the proper methods to collect the data, employ the correct analyses, and effectively present the results. This is crucial for making decisions based on data.
+
+So, understanding the types of distributions in statistics is crucial for data analysis, making predictions, statistical testing, and decision making. There are different types of distributions in statistics. Here are some common types of statistical distributions:
+
+1.  **Discrete Uniform Distribution**: This distribution describes an experiment where there is an arbitrary outcome that can be obtained with equal likelihood.
+
+    ![](images/discrete_unifrom_dist.png)
+
+2.  **Binomial Distribution**: This distribution describes the number of successes in a fixed number of independent Bernoulli trials with the same probability of success. The Bernoulli trial is an experiment where the outcome can be classified into two categories: success and failure.
+
+```{r}
+# Binomial Distribution Function
+binomial_formula <- function(n, k, p) {
+  choose(n, k) * p^k * (1-p)^(n-k)
+}
+
+# In this function, n is the number of trials, k is the number of successes, and p is the probability of success on each trial. The function calculates the probability of observing k successes in n trials given the probability of success p. The choose(n, k) function is used to calculate the number of combinations of n items taken k at a time. The function returns the calculated probability.
+```
+
+3.  **Poisson Distribution**: This distribution is used to model the number of times an event happened in a time interval. For example, if you're running a call center and you know that on average you receive 12 calls per hour (λ=12), you can use the Poisson distribution to calculate the probability of receiving a different number of calls in the next hour.
+
+```{r}
+# Poisson Distribution Formula
+poisson_formula <- function(lambda, k) {
+  probability <- (lambda^k * exp(-lambda)) / factorial(k)
+  return(probability)
+}
+
+# In this function, lambda is the average number of events per interval, and k is the actual number of events. The function calculates the probability of observing k events given the average rate of occurrence lambda. The exp function is used to calculate the exponential of -lambda, and factorial(k) calculates the factorial of k. The function returns the calculated probability. 
+```
+
+4.  **Normal Distribution**: Also known as the Gaussian distribution, this is a continuous probability distribution that is symmetric about the mean, showing that data near the mean are more frequent in occurrence than data far from the mean.
+
+```{r}
+# Normal Distribution Function
+normal_formula <- function(x, mean, sd) {
+  probability <- dnorm(x, mean, sd)
+  return(probability)
+}
+
+# In this function, x is the value for which you want to find the probability, mean is the mean of the distribution, and sd is the standard deviation. The function dnorm is a built-in R function that calculates the density of the Normal distribution for a given value of x. The function returns the calculated probability.
+
+# You can use this function to calculate the probability of a value under a Normal distribution with a given mean and standard deviation. For example, normal_formula(1.96, 0, 1) would give the probability of the value 1.96 under a standard Normal distribution (mean = 0, sd = 1).
+```
+
+5.  **Uniform Distribution**: This is a type of probability distribution in which all outcomes are equally likely. A deck of cards has a uniform distribution because the likelihood of drawing a heart, a club, a diamond, or a spade is equally likely.
+
+## **Sampling, Density, Distribution and Quantile Functions**
+
+All of R's built-in distributions are characterized by four functions, with a consistent pattern in their naming:
+
+-   Sampling function begins with r (`rnorm()`) \#
+
+-   Density function begins with d (`dnorm()`) \#
+
+-   Distribution function begins with p (`pnorm()`)
+
+-   Quantile function begins with q (`qnorm()`)
+
+::: callout-note
+💡 In R, **for different types of distributions**, we have different sets of functions for generating density (d), distribution function (p), quantile function (q), and random generation (r). Here are some examples:
+
+-   Normal Distribution: `dnorm`, `pnorm`, `qnorm`, `rnorm`
+-   Binomial Distribution: `dbinom`, `pbinom`, `qbinom`, `rbinom`
+-   Poisson Distribution: `dpois`, `ppois`, `qpois`, `rpois`
+-   Exponential Distribution: `dexp`, `pexp`, `qexp`, `rexp`
+-   Gamma Distribution: `dgamma`, `pgamma`, `qgamma`, `rgamma`
+-   Chi-Squared Distribution: `dchisq`, `pchisq`, `qchisq`, `rchisq`
+-   Uniform Distribution: `dunif`, `punif`, `qunif`, `runif`
+-   Beta Distribution: `dbeta`, `pbeta`, `qbeta`, `rbeta`
+-   Log-Normal Distribution: `dlnorm`, `plnorm`, `qlnorm`, `rlnorm`
+-   F Distribution: `df`, `pf`, `qf`, `rf`
+-   Weibull Distribution: `dweibull`, `pweibull`, `qweibull`, `rweibull`
+
+Each set of functions can be used to work with the corresponding distribution!
+:::
+
+::: callout-note
+👍 a brief explanation for each function:
+
+-   **rnorm()**: To generate random numbers from a normal distribution.
+
+-   **dnorm()**: To calculate the density (probability) of a specific point in a normal distribution.
+
+-   **pnorm()**: To calculate the cumulative probability up to a specific point in a normal distribution.
+
+-   **qnorm()**: To find the quantile (inverse of the cumulative probability) in a normal distribution.
+
+Each of these functions plays a crucial role in statistical analysis and data science, particularly **when working with normal distributions**.
+:::
+
+Let's go through each of these functions in details:
+
+### Sampling Function
+
+In statistics, sampling is the process of selecting a subset of individuals from a statistical population to estimate characteristics of the whole population. The sampling function in R allows us to generate random numbers according to a specific distribution.
+
+For instance, the `rnorm()` function in R generates random deviates from a normal distribution. The arguments to `rnorm()` include the number of observations to generate, the mean of the distribution, and the standard deviation.
+
+Here's an example:
+
+```{r}
+# Generate 5 random numbers from a normal distribution with mean 0 and standard deviation 1
+sample <- rnorm(5, mean=0, sd=1)
+print(sample)
+
+# In this code, rnorm(5, mean=0, sd=1) generates 5 random numbers from a normal distribution with a mean of 0 and a standard deviation of 1. The output will be 5 numbers that you can think of as 5 random draws from a normal distribution.
+```
+
+### Density Function
+
+In statistics, a density function is a function that describes the probability of **a random variable** within a particular range. The density function is the probability function for **a continuous random variable**.
+
+::: callout-note
+💡 In the context of probability and statistics, a random variable is understood as a measurable function defined on a probability space that maps from the sample space to the real numbers. A random variable's possible values might represent the possible outcomes of a yet-to-be-performed experiment, or the potential values of a quantity whose already-existing value is uncertain (e.g., as a result of incomplete information or imprecise measurements).
+
+1.  **Random Variable**: A random variable is a variable whose possible values are numerical outcomes of a random phenomenon. There are two types of random variables, discrete and continuous.
+2.  **Discrete Random Variable**: A discrete random variable is one which may take on only a countable number of distinct values such as 0,1,2,3,4,... Discrete random variables are usually (but not necessarily) counts. If a random variable can take only a finite number of distinct values, then it must be discrete. Examples of discrete random variables include the number of children in a family, the Friday night attendance at a cinema, the number of patients in a doctor's surgery, the number of defective light bulbs in a box of ten.
+3.  **Continuous Random Variable**: A continuous random variable is one which takes an infinite number of possible values. Continuous random variables are usually measurements. Examples include height, weight, the amount of sugar in an orange, the time required to run a mile.
+
+For discrete random variables, we use the probability mass function (PMF), not the density function. The PMF gives the probability that a discrete random variable is exactly equal to some value.
+
+For example, if we have a random variable X that represents the outcome of a dice roll, it's a discrete random variable because it can only take on a countable number of values: 1, 2, 3, 4, 5, or 6. The PMF of X would give us the probabilities of each of these outcomes. For a fair six-sided dice, the PMF would be 1/6 for each outcome.
+
+Let's consider an example using the probability mass function (PMF) for a discrete random variable. Suppose we have a fair six-sided die and we want to calculate the PMF for the outcome of a roll. In R, we could represent this as follows:
+
+```{r}
+# Define the outcomes of the die roll
+outcomes <- 1:6
+
+# Since the die is fair, each outcome has an equal probability
+probabilities <- rep(1/6, 6)
+
+# Create a data frame to represent the PMF
+pmf <- data.frame(outcome = outcomes, probability = probabilities)
+
+# Print the PMF
+print(pmf)
+```
+
+This code creates a data frame where each row represents an outcome of the die roll and its associated probability. Since the die is fair, each outcome has a probability of 1/6. The resulting PMF gives the probability of each outcome, which is the same for a fair die.
+:::
+
+Let's consider a simple example. Suppose we have a random variable X that represents the height of students in a school. The heights of the students are continuous data because they could take on any value within a certain range.
+
+The density function, often denoted as f(x), gives us the probability of the height of a student falling within a certain range. For instance, if we want to know the probability that a randomly selected student is between 160 cm and 170 cm tall, we would integrate the density function from 160 to 170.
+
+In R, you can use the **`density()`** function to estimate the density function from a set of data. Here's an example:
+
+```{r}
+# Generate some data
+heights <- rnorm(1000, mean=170, sd=10) # we use ssampling function btw! 
+
+# Estimate the density function
+height_density <- density(heights)
+
+# Plot the density function
+plot(height_density, main="Density Function of Student Heights")
+
+# In this code, rnorm(1000, mean=170, sd=10) generates a normal distribution of 1000 student heights with a mean of 170 cm and a standard deviation of 10 cm. The density() function then estimates the density function from this data, and plot() is used to visualize it.
+```
+
+We use **`dnorm(x, mean, sd)`** to calculate the density of the normal distribution with the specified mean and standard deviation at the point x. This gives you the height of the probability density function at x. The height of the density function at any given point can be thought of as the relative likelihood of that outcome compared to other outcomes.
+
+Let's consider a few examples:
+
+1.  **Standard Normal Distribution**: The standard normal distribution is a normal distribution with a mean of 0 and a standard deviation of 1. If we want to find the density of the standard normal distribution at x = 0.5, we can use the `dnorm()` function in R:
+
+    ```{r}
+    x <- 0.5
+    density_at_x <- dnorm(x, mean=0, sd=1)
+    print(paste("The density of the standard normal distribution at x =", x, "is", density_at_x))
+    ```
+
+    **Interpretation:** The output of this code gives the height of the probability density function at x = 0.5 for a standard normal distribution. This is not a probability, but rather an indication of how likely different outcomes around x = 0.5 are. In the context of a standard normal distribution, a higher density at a certain point means that outcomes around that point are more likely. So, a higher density at x = 0.5 means that outcomes around 0.5 are more likely than outcomes around points where the density is lower.
+
+2.  **Exam Scores**: Suppose we have a class of students and their exam scores are normally distributed with a mean of 70 and a standard deviation of 10. If we want to know the density of this distribution at a score of 80, we can use the `dnorm()` function:
+
+    ```{r}
+    x <- 80
+    density_at_x <- dnorm(x, mean=70, sd=10)
+    print(paste("The density of the exam score distribution at x =", x, "is", density_at_x))
+    ```
+
+    The output of this code gives the height of the probability density function at x = 80 for the exam score distribution. This tells us how likely it is for students to have scores around 80.
+
+Remember, the density at a specific point is not a probability, but rather a measure of how likely different outcomes are. The actual probability of a continuous random variable taking on a specific value is always 0. Instead, we often use the density function to calculate the probability that a random variable falls within a certain range, by integrating the density function over that range.
+
+In R, you can use numerical integration to approximate the integral of a function over an interval. The `integrate()` function in R performs numerical integration of a function of one variable over a finite or infinite interval.
+
+Here's an example of how you might use it to integrate the density function of a standard normal distribution from 0 to 0.5:
+
+```{r}
+# Define the function to integrate
+f <- function(x) {
+  dnorm(x, mean=0, sd=1)
+}
+
+# Perform the integration from 0 to 0.5
+result <- integrate(f, 0, 0.5)
+
+# Print the result
+print(paste("The integral of the density function from 0 to 0.5 is", result$value))
+
+# In this code, f is a function that returns the density of a standard normal distribution at a given point. integrate(f, 0, 0.5) then calculates the integral of this function from 0 to 0.5, and result$value gives the value of the integral.
+```
+
+**Interpretation:** This integral represents the probability of 0.19 that a random variable from a standard normal distribution falls within the interval from 0 to 0.5
+
+### Distribution function
+
+The distribution function, also known as the cumulative distribution function (CDF), describes the probability that a random variable X with a given probability distribution will be found at a value less than or equal to x.
+
+In the context of continuous random variables, the CDF is the area under the curve of the probability density function (PDF) up to a certain point. It's calculated by integrating the PDF from negative infinity up to that point.
+
+In R, the **`pnorm()`** function gives the CDF for a normal distribution. For example, **`pnorm(x, mean, sd)`** gives the probability that a normally distributed random variable with a certain mean and standard deviation will be less than or equal to x.
+
+1.  **Standard Normal Distribution**: For example, If we want to find the cumulative probability of the standard normal distribution at x = 0.5, we can use the **`pnorm()`** function in R:
+
+```{r}
+x <- 0.5
+cumulative_prob_at_x <- pnorm(x, mean=0, sd=1)
+print(paste("The cumulative probability at x =", x, "is", cumulative_prob_at_x))
+
+```
+
+**Interpretation:** The output of this code gives the cumulative probability at x = 0.5 for a standard normal distribution. This is the probability that a randomly selected value from this distribution is less than or equal to 0.5.
+
+2.  **Exam Scores**:Suppose we have a class of students and their exam scores are normally distributed with a mean of 70 and a standard deviation of 10. If we want to know the cumulative probability of this distribution at a score of 80, we can use the **`pnorm()`** function:
+
+    ```{r}
+    x <- 80
+    cumulative_prob_at_x <- pnorm(x, mean=70, sd=10)
+    print(paste("The cumulative probability at x =", x, "is", cumulative_prob_at_x))
+
+    ```
+
+**Interpretation:** The output of this code gives the cumulative probability at x = 80 for the exam score distribution. This is the probability that a randomly selected exam score from this distribution is less than or equal to 80.
+
+::: callout-note
+⚠️ Remember, the cumulative distribution function gives the probability that a random variable is less than or equal to a certain value.
+:::
+
+If you want to find the probability that a random variable falls within a certain range, you can calculate the difference between the CDF values at the endpoints of the range. In R, the **`pnorm()`** function also gives the probability that a random variable falls within a certain range.
+
+```{r}
+# Define the mean and standard deviation
+mean <- 0
+sd <- 1
+
+# Define the range
+x1 <- -1
+x2 <- 1
+
+# Calculate the probability of the random variable falling within the range
+prob <- pnorm(x2, mean, sd) - pnorm(x1, mean, sd)
+
+print(paste("The probability that the random variable falls between", x1, "and", x2, "is", prob))
+
+#In this code, pnorm(x2, mean, sd) - pnorm(x1, mean, sd) calculates the probability that a random variable from a normal distribution with the specified mean and standard deviation falls between x1 and x2. This is done by calculating the integral of the density function from x1 to x2, which is the area under the curve of the density function between these two points.
+```
+
+::: callout-note
+⚠️ The `pnorm()` function and the `integrate()` function in R can both be used to calculate the probability that a random variable falls within a certain range, but they do so in slightly different ways:
+
+1.  **pnorm()**: The `pnorm()` function directly calculates the cumulative distribution function (CDF) for a normal distribution. This gives the probability that a random variable from a normal distribution is less than or equal to a certain value. To find the probability that the variable falls within a range, you can calculate the difference between the CDF values at the endpoints of the range. This method is straightforward and computationally efficient.
+
+2.  **integrate()**: The `integrate()` function can be used to numerically integrate any function over a specified interval. When used with the density function (obtained using `dnorm()`), this effectively calculates the area under the probability density function (PDF) curve over the specified interval, which gives the probability that a random variable falls within that range. This method is more flexible because it can be used with any PDF, not just the normal distribution, but it may be less accurate and less efficient for large datasets or complex functions due to the numerical approximation involved in the integration.
+
+In summary, while both methods can be used to calculate probabilities for a normal distribution, `pnorm()` is generally the preferred method due to its simplicity and efficiency. The `integrate()` function is a more general tool that can be used when dealing with other distributions or more complex probability density functions.
+:::
+
+### Quantile Function
+
+The quantile function, also known as the inverse cumulative distribution function, is used to map from a probability to a value from the corresponding distribution. In other words, it answers questions like "What is the value below which a random sample from a standard normal distribution would fall 95% of the time?"
+
+For example, in R, the `qnorm()` function calculates the quantile function of a normal distribution. If you wanted to find the 90th percentile of a standard normal distribution, you could use it like this:
+
+```{r}
+percentile_90 <- qnorm(0.9, mean=0, sd=1)
+print(paste("The 90th percentile is", percentile_90))
+```
+
+**Interpretation:** This code calculates the 90th percentile of a standard normal distribution using `qnorm(0.9, mean=0, sd=1)`. This means that a random sample from this distribution would be expected to fall at this value or below 90% of the time.
+
+```{r}
+# sample 200 numbers from a standard normal
+y = rnorm( 200 )
+
+# show the histogram of y
+hist( y )
+```
+
+```{r}
+# calculate the 0.025 and 0.975 quantiles of y
+# specify the vector first, then the quantiles:
+quantile(y, c(0.025, 0.975))
+```
+
+```{r}
+# put the quantiles on the histogram
+hist(y)
+abline( v=quantile(y, c(0.025, 0.975)), lty=3 )
+```
+
+**Interpretation:** This becomes extremly useful for answering questions like, "what is the critical value that a standard normal random variable falls below 95% of the time?"
+
+Let's take an other example. Here is an example of a test score question based on the current web page:
+
+Suppose you are a student who took a statistics exam that had 20 questions. You answered 15 questions correctly and 5 questions incorrectly. The exam scores are normally distributed with a mean of 75 and a standard deviation of 10. What is your z-score and how do you compare to the rest of the class?
+
+To answer this question, you need to use the formula for the z-score, which is:
+
+z = (x - mu) / sigma
+
+where x is your raw score, mu is the mean of the population, and sigma is the standard deviation of the population.
+
+To calculate your raw score, you need to multiply the number of correct answers by 5, since each question is worth 5 points. So, your raw score is:
+
+x = 15 \* 5 = 75
+
+To calculate your z-score, you need to plug in the values of x, mu, and sigma into the formula:
+
+z = (75 - 75) / 10 = 0
+
+Your z-score is zero, which means that your score is exactly equal to the mean of the population. This means that you performed average compared to the rest of the class. You can also use the pnorm() function in R to find the proportion of scores that are less than or equal to yours:
+
+```{r}
+pnorm_zero <- pnorm(0)
+
+print(paste("pnorm(0) is:", pnorm(0)))
+```
+
+**Interpretation:** The result is 0.5, which means that 50% of the scores are below or equal to yours, and 50% are above yours. This confirms that you are in the middle of the distribution.
+
+## Models
+
+Model is a thing that shows the relationship between input and output.
+
+::: callout-note
+⚠️ In the context of mathematics and statistics, a function is a relation between a set of inputs and a set of possible outputs where each input is related to exactly one output. It's a mapping from a set X (the domain) to a set Y (the codomain) that assigns to each element of X exactly one element of Y¹.
+
+On the other hand, a model is an abstract description of a system using mathematical concepts and language. It's a representation of a system that allows for investigation of the properties of the system and in some cases prediction of future outcomes. Models are often used to describe complex real-world systems that would be difficult to study directly.
+
+So, the key difference between a function and a model is that a function is a single mathematical relation with a clear input-output relationship, while a model is a more complex representation that can include multiple functions and relationships between variables. A model can represent a system with many elements and their interactions, while a function typically represents a single relationship between inputs and outputs.
+
+1.  **Weather Forecasting Models**: These models use data on current weather conditions (temperature, humidity, wind speed, etc.) and apply mathematical algorithms to predict future weather patterns.
+
+2.  **Economic Models**: Economists use models to understand economic behaviors and predict future economic scenarios. For example, the supply-demand model helps understand how changes in price affect the quantity of goods sold.
+
+3.  **Traffic Flow Models**: These models simulate traffic on road networks and can be used to predict congestion and optimize traffic signals.
+
+4.  **Epidemiological Models**: These models are used in public health to understand how diseases spread in a population and to predict the impact of interventions.
+
+5.  **Financial Risk Models**: In finance, models are used to assess the risk associated with certain investments. For example, the Black-Scholes model is used to price options.
+
+6.  **Deep Learning Models**: Deep learning models are used in artificial intelligence to make predictions or decisions without being explicitly programmed to perform the task. For example, they are used in computer vision for object detection, image classification, image restoration, and image segmentation.
+
+These are just a few examples. Models are used in nearly every field to help understand complex systems and make predictions.
+:::
+
+There are several models we used in statistics quite a lot to describe and predict changes in a subject of interest. Here are some of them:
+
+-   **Linear Models:** Linear models describe a continuous response variable as a function of one or more predictor variables. They can help you understand and predict the behavior of complex systems or analyze experimental, financial, and biological data. They are often used in the context of regression, where the goal is to predict a continuous outcome variable from one or more predictor variables.
+
+-   **Exponential Models:** Exponential models describe processes that change at a rate proportional to the current value, such as compound interest, population growth, or radioactive decay. These models can be used to describe rapid growth or decay.
+
+-   **Logistic Growth Models:** Logistic growth models are used when a population's growth rate gets smaller and smaller as the population size approaches a maximum imposed by limited resources in the environment, known as the carrying capacity. This model produces an S-shaped curve, which is common in many natural processes, including the growth of populations and the spread of diseases.
+
+::: callout-note
+💡 There are many other types of models used in various fields. These are just a few examples. The type of model used depends on the specific situation and the type of data available.
+:::
+
+### Linear Models
+
+![](images/linear_rel.png){width="751"}
+
+#### **lm() function to simulate linear models in R:**
+
+In R, linear models are typically fitted using the `lm()` function. This function fits a linear model to data by finding the line of best fit that minimizes the total error of the model.
+
+Here's an example of how you might use it:
+
+```{r}
+# Create some data
+x <- c(1, 2, 3, 4, 5)
+y <- c(2, 3, 5, 7, 11)
+
+# Fit a linear model
+model <- lm(y ~ x)
+
+# Print the model summary
+summary(model)
+```
+
+In this code, `lm(y ~ x)` fits a linear model to the data with `y` as the response variable and `x` as the predictor variable. The `summary(model)` function then prints a summary of the model, including the coefficients, residuals, and other diagnostic measures.
+
+::: callout-note
+⚠️ The **`summary()`** function provides a lot of information. Here's what some of it means:
+
+-   **Call**: This shows the function call that you used to fit the model. (`lm(y ~ x) in the example above)`
+
+-   **Residuals**: This section provides summary statistics for the residuals, which are a measure of how far off our model's predictions are for each point.
+
+-   **Coefficients**: This is one of the most important parts of the output. It gives the coefficients of the model, the standard error of these coefficients, and the t-value and p-value of the hypothesis test that the coefficient is different from 0. The "Estimate" column gives the coefficients of the intercept and the predictor variable(s). In this case, the coefficient for **`x`** is the slope of the line of best fit.
+
+-   **Residual standard error**: This is the standard deviation of the residuals. It gives a measure of how wrong our model's predictions are likely to be.
+
+-   **Multiple R-squared**: This is the proportion of variance in the response variable that can be explained by the predictor variables. It provides a measure of how well the model fits the data.
+
+-   **F-statistic and p-value**: The F-statistic is a measure of how much better the model fits the data than a model that has no predictor variables. The p-value associated with this F-statistic is the probability of observing such an F-statistic, or one more extreme, under the null hypothesis that the model with no predictor variables fits the data as well as our model.
+:::
+
+Linear models are a fundamental tool in statistical analysis and data science, and they are often used to understand the relationship between variables and make predictions.
+
+So, let's get more examples:
+
+```{r}
+library(readxl)
+library(here)
+
+ageandheight <- read_excel(here("data", "ageandheight.xls"))
+
+plot(ageandheight$age,ageandheight$height)
+```
+
+```{r}
+cor(ageandheight$age, ageandheight$height)
+```
+
+The `lm` command takes the variables in the format:
+
+`lm([target] ~ [predictor / features], data = [data source])`
+
+```{r}
+lmheight <- lm(height~ age, data = ageandheight)
+
+summary(lmheight)
+```
+
+you can see the values of the intercept ("a" value) and the slope ("b" value) for the age. These "a" and "b" values plot a line between all the points of the data. So, in this case, if there is a child that is 20.5 months old, a is 64.92, and b is 0.635, the model predicts (on average) that its height in centimeters is around 64.92 + (0.635 \* 20.5) = 77.93 cm.
+
+::: callout-note
+💡When a regression takes into account two or more predictors to create the linear regression, it's called multiple linear regression.
+:::
+
+#### Line of Best Fit
+
+A good way to test the quality of the fit of the model is to look at the residuals or the differences between the real values and the predicted values. The straight line in the image above represents the predicted values. The red vertical line from the straight line to the observed data value is the residual.
+
+![](images/residual.png)
+
+One measure very used to test how good your model is is the coefficient of determination or R². This measure is defined by the proportion of the total variability explained by the regression model.
+
+::: callout-note
+💡 The coefficient of determination, also known as R² or r-squared, is a statistical measure that determines the proportion of variance in the dependent variable that can be explained by the independent variable. It is a number between 0 and 1 that measures how well a statistical model predicts an outcome.
+
+Here's how to interpret the coefficient of determination (R²)¹:
+
+\- **0**: The model does not predict the outcome.
+
+\- **Between 0 and 1**: The model partially predicts the outcome.
+
+\- **1**: The model perfectly predicts the outcome.
+
+In other words, the better a model is at making predictions, the closer its R² will be to 1. For example, if you perform a simple linear regression that predicts students' exam scores (dependent variable) from their time spent studying (independent variable), and the R² is 0.6, it means that 60% of the variation in exam scores can be explained by the time spent studying.
+
+It's important to note that while a higher R² indicates a better fit of the model to the data, it doesn't necessarily mean the model is good. Other factors, such as the appropriateness of the model's form and the validity of its assumptions, should also be considered.
+:::
+
+#### Example 1:
+
+```{r}
+billionare <- readxl::read_excel(here("data", "millionaires.xlsx"))
+plot(billionare$millionaires, billionare$population)
+cor(billionare$millionaires, billionare$population)
+```
+
+```{r}
+lmbillionare <- lm(millionaires~population, data = billionare)
+summary(lmbillionare)
+```
+
+1.  What is the interpretation of ŷ for this model, if y represents the variable, Millionaires?
+
+    It is predicted number of millionaires based on a population in a state.
+
+2.  This linear model crosses the y-axis at 6.296. What is the interpretation of this point?
+
+    A state with population of 0 is expected to have 6.296 millionaires.
+
+```{r}
+new_pop <- billionare$population-min(billionare$population)
+billionare <- cbind(billionare,new_pop)
+
+lmbillionare <- lm(millionaires~new_pop, data = billionare)
+summary(lmbillionare)
+
+```
+
+```{r}
+plot(billionare$population,billionare$millionaires)
+abline(lmbillionare, col="red")
+```
+
+1.  What is the interpretation of **17.82** in this model?
+
+    On average, a state with population equal to the lowest population has 17,820 millionaires.
+
+2.  Interpret **1.921** in the above model (with an intercept of 17.82).
+
+    as the population of a state increases by 100000, they will gain 1,921 millionires
+
+**Example 2:**
+
+This data set contains the world record time or distance of a various track and field events for both men and women. And for this exercise, we're going to be using the men's 800-meter event. So we're going to be looking at the world-record time, which is housed in this "record" variable, as well as the year that the world record was broken.
+
+So let's make a new data frame called mens800 and pull out the cases from World Record based on a logical indexing statement. So we're going to say, World Record Event equals equals Men's 800 meter.
+
+```{r}
+wr <- read.csv(here("data", "worldrecord.csv"))
+
+man.800 <- wr[wr$Event=="Mens 800m",]
+
+```
+
+```{r}
+reg<-lm(Record~Year, data = man.800)
+summary(reg)
+```
+
+```{r}
+plot(man.800$Year,man.800$Record, xlab = "Year", ylab = "Time in Seconds")
+abline(reg, col="red")
+```
+
+\## Linear Fit
+
+\## Intercept = 346.0325
+
+\## Slope = -0.12252
+
+\## R-squared = 0.93554
+
+**Interpretation:**
+
+-   **Intercept (346)**: The intercept is the expected value of **`y`** when all **`x`** variables are 0. In this context, it represents the world-record time for the 800 meters at the starting point of the data collection (the year when **`x`** is 0). However, keep in mind that the intercept often doesn't have a meaningful interpretation if 0 isn't a sensible value for the predictor variable.
+
+-   **Slope (-0.12)**: The slope is the expected change in **`y`** for a one-unit increase in **`x`**. Here, it means that for each additional year, the world-record time for the 800 meters decreases by about 0.12 seconds. This indicates a trend of improvement in the world-record time over the years.
+
+-   **R-squared (94%)**: The R-squared value, also known as the coefficient of determination, measures the proportion of the variance in the dependent variable that is predictable from the independent variable(s). An R-squared of 94% means that 94% of the variation in the world-record time can be explained by the year of the record. This suggests that the model fits the data fairly well.

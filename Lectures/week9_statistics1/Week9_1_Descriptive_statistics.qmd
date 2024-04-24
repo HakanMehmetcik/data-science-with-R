@@ -1,0 +1,1219 @@
+---
+title: "Descriptive_statistics"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: true
+  output: asis
+df-print: kable
+---
+
+# Week 3: Descriptive Statistics
+
+## **Learning Objectives:**
+
+By the end of this chapter, students should be able to:
+
+1.  **Fundamentals of Visualization**
+
+    -   Learn fundamental visualization tools help you gain insights from your data by presenting it in a visual and intuitive manner.
+
+    -   Create and interpret these visual tools with R.
+
+2.  **Utilize Histograms and Box Plots:**
+
+    -   Understand the purpose and importance of histograms and box plots as graphical tools for visualizing data distributions.
+
+    -   Create and interpret histograms and box plots to display data effectively.
+
+3.  **Calculate Measures of Central Location: Mean and Median:**
+
+    -   Define the mean (average) and median as measures of central location.
+
+    -   Calculate the mean and median of a dataset.
+
+    -   Recognize situations where each measure is more appropriate for summarizing data.
+
+4.  **Calculate Measures of Spread: Variance, Standard Deviation, and Inter-Quartile Range:**
+
+    -   Define variance, standard deviation, and inter-quartile range (IQR) as measures of data spread or dispersion.
+
+    -   Calculate variance, standard deviation, and IQR for a dataset.
+
+    -   Interpret these measures to understand the variability in data.
+
+5.  **Identify Outlier:**
+
+    -   Define outlier as values that deviate significantly from the rest of the data distribution.
+
+    -   Recognize various methods, such as the IQR method, for identifying outlier in a dataset.
+
+    -   Understand the potential impact of outlier on data analysis and interpretation.
+
+## Fundamentals of Visualization
+
+Once data is collected, the process of analyzing and understanding it begins. Statistical graphs are powerful tools that help us gain insights into the distribution and patterns within the data. Here are some key points about what you can do with data using statistical graphs:
+
+1.  **Data Exploration:** Statistical graphs provide a visual representation of data, making it easier to explore and understand the underlying patterns and trends. This initial exploration helps in forming hypotheses and identifying areas of interest.
+
+2.  **Summary of Data Distribution:** Graphs summarize the distribution of data, including measures of central tendency (e.g., mean, median) and dispersion (e.g., variance, standard deviation). They allow you to see where data clusters and how spread out it is.
+
+3.  **Identifying Outliers:** Outliers, which are data points that deviate significantly from the majority of the data, are often easily spotted in graphs. Identifying outliers is crucial because they can impact the interpretation of the data and statistical analysis.
+
+4.  **Comparing Data:** Graphs enable the comparison of different datasets or groups. For example, you can compare the distributions of two or more samples to assess similarities, differences, or trends.
+
+5.  **Communication:** Statistical graphs are effective tools for communicating findings to others, including colleagues, stakeholders, or the general public. Visualizations can make complex data more accessible and understandable.
+
+6.  **Hypothesis Generation:** The visual exploration of data through graphs often leads to the generation of hypotheses. These hypotheses can then be tested using formal statistical methods.
+
+7.  **Data Preprocessing:** Graphical analysis can reveal data preprocessing needs, such as transformations, scaling, or handling missing values. Understanding data distribution aids in preparing data for modeling.
+
+8.  **Model Selection:** Graphs can inform model selection decisions. For example, if the data shows a clear linear relationship, you might choose a linear regression model.
+
+9.  **Quality Control:** In fields like manufacturing and quality control, statistical process control charts are used to monitor the stability and quality of processes over time.
+
+Overall, statistical graphs serve as a starting point for data analysis. They help analysts and researchers form hypotheses, make informed decisions about analysis techniques, and effectively communicate insights from the data. Statistical graphs are a fundamental tool in the data analysis toolkit.
+
+Let's dive into the fundamentals of data visualization and explain each of the mentioned visual tools in more detail:
+
+1.  **Bar Plot:**
+
+    -   **Data Type:** Categorical
+
+    -   **Description:** Bar plots are used to represent categorical data, which consists of distinct categories or groups. Each category is displayed as a separate bar, and the height of the bar represents the frequency or count of data points in that category. Bar plots are effective for comparing the distribution of categories.
+
+    -   **Example:** Visualizing the frequency of car types in the "mtcars" dataset.
+
+```{r}
+# Load the mtcars dataset
+data(mtcars)
+
+# Create a bar plot to visualize the frequency of car models
+barplot(table(mtcars$carb))
+
+```
+
+2.  **Pie Chart:**
+
+    -   **Data Type:** Categorical
+
+    -   **Description:** Pie charts are used to visualize categorical data by dividing a circle into slices, where each slice represents a category. The size of each slice is proportional to the percentage or proportion of data points in that category relative to the whole.
+
+    -   **Example:** Visualizing the distribution of species in the "iris" dataset.
+
+```{r}
+# Load the iris dataset
+data(iris)
+
+# Create a pie chart of species proportions
+pie(table(iris$Species), main="Pie Chart of Species Proportions")
+```
+
+3.  **Stacked Bar Plot:**
+
+    -   **Data Type:** Categorical
+
+    -   **Description:** Stacked bar plots are an extension of bar plots for categorical data. They allow you to compare subcategories within each category. Each bar is divided into segments, and the height of each segment represents the frequency or count of a subcategory within the category.
+
+    -   **Example:** Visualizing the distribution of passenger class (Pclass) and gender (Sex) in the "Titanic" dataset.
+
+```{r}
+# Load the Titanic dataset from the "datasets" package
+data("Titanic")
+
+Titanic <- as.data.frame(Titanic)
+Titanic <- Titanic[Titanic$Freq > 0, ]
+
+# Create an empty data frame for the expanded dataset
+expanded_data <- data.frame()
+
+# Loop through each row of the original dataset
+for (i in 1:nrow(Titanic)) {
+  # Repeat the row based on the "Freq" value
+  expanded_row <- Titanic[i, ]
+  expanded_row <- expanded_row[rep(1, expanded_row$Freq), ]
+  
+  # Append the expanded row to the new dataset
+  expanded_data <- rbind(expanded_data, expanded_row)
+}
+
+# Reset row names and remove the "Freq" column
+row.names(expanded_data) <- NULL
+expanded_data$Freq <- NULL
+
+# Now "expanded_data" contains each individual passenger as a separate observation
+expanded_data_table <- table(expanded_data$Survived, expanded_data$Class)
+barplot(expanded_data_table, beside = TRUE, col = c("red", "green"))
+
+# Corrected legend line
+legend("topleft", legend = rownames(expanded_data_table), fill = c("red", "green"), title = "Survived")
+```
+
+4.  **Histogram:**
+
+    -   **Data Type:** Numeric
+
+    -   **Description:** Histograms are used to visualize the distribution of numeric data. They divide the data into intervals or bins and display the frequency or count of data points in each interval as bars. Histograms provide insights into the shape, central tendency, and spread of the data.
+
+    -   **Example:** Visualizing the distribution of Sepal Length in the "iris" dataset.
+
+```{r}
+# Load the iris dataset
+data(iris)
+
+# Create a histogram of Sepal Length
+hist(iris$Sepal.Length, main="Histogram of Sepal Length", xlab="Sepal Length")
+```
+
+::: callout-note
+💡Both barplot and histogram works for univariate statistics: Bar plot is used for categorical data (and their frequencies) while histograms are used for numeric variables and their frequencies!
+:::
+
+```{r}
+table_gap <- table(gapminder::gapminder$continent)
+barplot(table_gap)
+```
+
+```{r}
+hist_gap <- gapminder::gapminder$lifeExp
+hist(hist_gap)
+```
+
+5.  **Box Plot (Box-and-Whisker Plot):**
+
+    -   **Data Type:** Numeric
+
+    -   **Description:** Box plots provide a visual summary of the distribution of numeric data. They display the median (central value), quartiles (25th and 75th percentiles), and potential outliers in the data. Box plots are useful for detecting skewness and outliers.
+
+    -   **Example:** Visualizing the distribution of Sepal Width by Species in the "iris" dataset.
+
+```{r}
+# Load the iris dataset
+data(iris)
+
+# Create a box plot of Sepal Width by Species
+boxplot(Sepal.Width ~ Species, data=iris, main="Box Plot of Sepal Width by Species")
+```
+
+6.  **Density Plot (Kernel Density Plot):**
+
+    -   **Data Type:** Numeric
+
+    -   **Description:** Density plots show the probability density function of numeric data. They provide a smoothed representation of the data distribution, which can be especially useful for understanding the shape of the distribution and identifying multiple peaks.
+
+    -   **Example:** Visualizing the distribution of Petal Length by Species in the "iris" dataset.
+
+```{r}
+# Load the iris dataset
+data(iris)
+
+# Create a density plot of Petal Length by Species
+plot(density(iris$Petal.Length), main="Density Plot of Petal Length by Species", xlab="Petal Length")
+```
+
+7.  **Scatter Plot:**
+
+    -   **Data Type:** Numeric
+
+    -   **Description:** Scatter plots are used to visualize the relationship between two numeric variables. Each data point is represented as a dot on the plot, with one variable on the x-axis and the other on the y-axis. Scatter plots help identify patterns, correlations, or clusters in the data.
+
+    -   **Example:** Visualizing the relationship between Sepal Length and Sepal Width in the "iris" dataset.
+
+```{r}
+# Load the iris dataset
+data(iris)
+
+# Create a scatter plot of Sepal Length vs. Sepal Width
+plot(iris$Sepal.Length, iris$Sepal.Width, main="Scatter Plot of Sepal Length vs. Sepal Width", xlab="Sepal Length", ylab="Sepal Width")
+```
+
+::: callout-note
+⚠️ The rest is just to show other possibilities! While these are meant to provide depth and context, they are not essential for following the main narrative.
+
+focus!
+
+Feel free to explore the rest of the examples provided here, if you have a particular interest in the subject or wish to delve deeper into the content. However, if you prefer a more streamlined reading experience or are seeking a quick overview, you can comfortably skip these sections without losing your focus!
+:::
+
+8.  **Time Series Plot:**
+
+    -   **Data Type:** Time Series
+
+    -   **Description:** Time series plots are used for visualizing data collected over time. They show how a numeric variable changes over a specific time period, making them ideal for analyzing trends, seasonality, and patterns in time-based data.
+
+    -   **Example:** Visualizing the monthly air passenger counts in the "AirPassengers" dataset.
+
+```{r}
+# Load the AirPassengers dataset
+data(AirPassengers)
+
+# Create a time series plot of monthly passenger counts
+plot(AirPassengers, main="Monthly Air Passenger Counts", xlab="Year", ylab="Passenger Count")
+```
+
+9.  **Scatter Plot on Maps:**
+
+    -   **Data Type:** Geographic
+
+    -   **Description:** Scatter plots on maps are used to visualize data points with geographic coordinates. Each data point is placed on a map at its specified latitude and longitude, allowing you to explore spatial patterns or relationships in data.
+
+    -   **Example:** Visualizing the distribution of earthquake locations using the "quakes" dataset.
+
+```{r}
+# Load the quakes dataset
+data(quakes)
+
+# Create a scatter plot on a map of earthquake locations
+plot(quakes$long, quakes$lat, main="Earthquake Locations", xlab="Longitude", ylab="Latitude", pch=20, col="red")
+```
+
+10. **Word Cloud:**
+
+```         
+-   **Data Type:** Textual/Nominal
+
+-   **Description:** Word clouds are used to display textual data, such as word frequency in a text document. Words are sized based on their frequency of occurrence, with more frequent words appearing larger. Word clouds provide a visual summary of the most common terms in text data.
+
+-   **Example:** Visualizing word frequency in a text using the "tm" and "wordcloud" packages.
+```
+
+```{r}
+# Load the "tm" and "wordcloud" packages
+library(tm)
+library(wordcloud)
+
+# Create a word cloud of word frequencies
+text <- c("R is a powerful language for data analysis and visualization",
+          "Data visualization helps in understanding complex data",
+          "Word clouds are useful for summarizing text data")
+
+# Create a corpus and preprocess the text
+corpus <- Corpus(VectorSource(text))
+corpus <- tm_map(corpus, content_transformer(tolower))
+
+# Create a word cloud
+wordcloud(corpus, min.freq=1, scale=c(2,0.5), colors=brewer.pal(8, "Dark2"))
+```
+
+These fundamental visualization tools help you gain insights from your data by presenting it in a visual and intuitive manner. Choosing the right visualization method depends on your data type and the specific questions you want to answer.
+
+Here's a table that summarizes different data types and the possible visual tools you can use to represent them:
+
+| **Data Type**   | **Visual Tool**               | **Description**                                               |
+|-----------------|-------------------------------|---------------------------------------------------------------|
+| Categorical     | Bar Plot                      | Displays the frequency or count of each category.             |
+| Categorical     | Pie Chart                     | Shows the proportions or percentages of each category.        |
+| Categorical     | Stacked Bar Plot              | Compares the distribution of subcategories within categories. |
+| Numeric         | Histogram                     | Represents the distribution of numeric values in intervals.   |
+| Numeric         | Box Plot (Box-and-Whisker)    | Displays the summary statistics and identifies outliers.      |
+| Numeric         | Density Plot (Kernel Density) | Shows the probability density function of the data.           |
+| Numeric         | Scatter Plot                  | Depicts the relationship between two numeric variables.       |
+| Time Series     | Time Series Plot              | Visualizes data collected over time, such as stock prices.    |
+| Geographic      | Scatter Plot on Maps          | Maps data points with geographic coordinates.                 |
+| Textual/Nominal | Word Cloud                    | Highlights word frequency in textual data.                    |
+
+These are some common data types and the corresponding visualization tools frequently used in data analysis. The choice of visualization method depends on the nature of your data and the insights you want to convey.
+
+## Introduction to Descriptive Statistics
+
+Let's recall that statistics is to help us answer questions from the data.
+
+![](images/stat-population.png)
+
+Population and parameter as information about the population is generally unknown. In order to estimate these parameters, we need our sample, whether from a designed experiment or observational study. But just like we cannot use entire sample, we have to rely on appropriately chosen summary number of the sample to estimate our parameters. This is statistic, or any number calculated from our sample.
+
+To begin with, you have to find a way to summarize the data, that is what descriptive statistics is all about. Further, we cannot---or should not---make definitive decisions from descriptive statistics. Rather, descriptive statistics can give us a general idea what is going on in the dataset and point us in the direction of interesting relationships between variables in the dataset.
+
+## Descriptive Statistics with Categorical Variables
+
+When it comes to categorical variables, we are interested in percentage of population or sample. The population proportion (notated p) or percentage of the population that falls into same category of interests.
+
+p = number of subjects in category / sample size
+
+Here, the most common summary is the frequency table, which gives the counts for the number of subjects that fall in each category.
+
+You can create a frequency table in R using the **`table()`** function. In your case, you have a vector **`books_readers`** that contains categories of readers and their corresponding counts. Here's the R code to create a frequency table and an explanation of how to interpret it:
+
+```{r}
+# Create the vector with reader categories and counts
+books_readers <- c("no_books"=395, "print_only"=577, "digital_only"=91, "print_and_digital"=425)
+
+# Create a frequency table
+frequency_table <- table(books_readers)
+
+# Print the frequency table
+print(frequency_table)
+
+```
+
+Now, let's interpret the frequency table:
+
+-   "no_books": 395 individuals fall into the category of "no_books." This means that 395 readers do not read any books (print or digital).
+
+-   "print_only": 577 individuals fall into the category of "print_only." This means that 577 readers exclusively read print books and do not read digital books.
+
+-   "digital_only": 91 individuals fall into the category of "digital_only." This means that 91 readers exclusively read digital books and do not read print books.
+
+-   "print_and_digital": 425 individuals fall into the category of "print_and_digital." This means that 425 readers read both print and digital books.
+
+In summary, the frequency table breaks down the count of readers into different categories based on their reading habits. It provides a clear and concise summary of how many readers fall into each category. This information can be useful for analyzing and understanding the distribution of reading preferences among the surveyed individuals.
+
+Ok, Now let's look into what would be the sample proportion for people who read only print books?
+
+```{r}
+# Count of "print_only"
+count_print_only <- books_readers["print_only"]
+
+# Total sample size (sum of all counts)
+total_sample_size <- sum(books_readers)
+
+# Calculate the sample proportion
+sample_proportion_print_only <- count_print_only / total_sample_size
+
+# Print the sample proportion
+print(sample_proportion_print_only)
+
+```
+
+A contingency tables lists all of the possible variations between two or more categorical variables!
+
+```{r}
+# Calculate proportions for each category
+proportions <- books_readers / sum(books_readers)
+
+# Print the proportions
+print(proportions)
+
+```
+
+This code will calculate the proportions for each category in the "books_readers" vector by dividing each count by the total sample size. It provides the proportions of readers in each category relative to the entire sample
+
+Are you an active, casual, or uninterested consumer of science news?
+
+```{r}
+# Create vectors for each racial/ethnic group
+white <- c("active"=487, "causal"=916, "uninterested"=1431, "no_answer"=28)
+black <- c("active"=59, "causal"=98, "uninterested"=227, "no_answer"=8)
+hispanic <- c("active"=89, "causal"=152, "uninterested"=183, "no_answer"=23)
+
+# Combine the vectors into a data frame
+my_table <- as.data.frame(rbind(white, black, hispanic))
+
+# Print the data frame
+print(my_table)
+```
+
+This code creates a data frame **`my_table`** where each row corresponds to a racial/ethnic group (white, black, and hispanic), and each column corresponds to a category within that group (active, causal, uninterested, and no_answer). The numbers in the data frame represent the counts of individuals in each category for each group.
+
+You can now perform various analyses and calculations using this data frame, such as calculating proportions, conducting chi-squared tests, or creating visualizations to explore the relationships between racial/ethnic groups and their preferences or responses in different categories.
+
+```{r}
+
+my_table$rowsum <- rowSums(my_table)
+my_table["colsum",] <- colSums(my_table)
+```
+
+Let's break down what each line of code does:
+
+1.  **`my_table$rowsum <- rowSums(my_table)`**: This line calculates the row sums for each row in the data frame and stores the result in a new column called "rowsum" in **`my_table`**. Each element in the "rowsum" column represents the sum of counts for each racial/ethnic group.
+
+2.  **`my_table["colsum",] <- colSums(my_table)`**: This line calculates the column sums for each column in the data frame and adds a new row labeled "colsum" to **`my_table`**. Each element in the "colsum" row represents the sum of counts for each category across all racial/ethnic groups.
+
+After running these lines of code, your **`my_table`** data frame will include row sums in the "rowsum" column and column sums in the "colsum" row. This can be useful for various analyses and calculations, such as calculating proportions, percentages, or conducting statistical tests to explore the relationships between categories and groups.
+
+### A recap for contingency tables:
+
+Overall, a contingency table, also known as a cross-tabulation or crosstab, is a table used in statistics to summarize and display the relationship between two or more categorical variables. It provides a way to analyze and visualize how the categories of one variable are distributed across the categories of another variable. Contingency tables are particularly useful for understanding the association, dependence, or independence between categorical variables.
+
+**Components of a Contingency Table:**
+
+-   **Rows:** Represent the categories of one categorical variable (e.g., variable A).
+
+-   **Columns:** Represent the categories of another categorical variable (e.g., variable B).
+
+-   **Cells:** Contain the counts or frequencies of observations that belong to a specific combination of categories from variables A and B.
+
+**How to Use a Contingency Table:**
+
+1.  **Creating a Contingency Table:**
+
+    -   Use the **`table()`** function in R to create a contingency table that summarizes the joint frequencies or counts of the two categorical variables.
+
+2.  **Interpreting the Table:**
+
+    -   Examine the counts in each cell to understand how the categories of the two variables are related.
+
+    -   Look for patterns or trends in the distribution of data.
+
+    -   Determine whether there is a significant association or independence between the variables.
+
+3.  **Testing for Independence:**
+
+    -   If you want to test whether two categorical variables are independent (i.e., whether there's a statistically significant association), you can perform a chi-squared test of independence.
+
+Now, let's use the "Titanic" dataset available in R to create a contingency table and demonstrate its use. In this example, we'll examine the relationship between passenger class (Pclass) and survival status (Survived):
+
+### A better Example: Survival rate at Titanic
+
+```{r}
+titanic <-  read.csv(
+"https://raw.githubusercontent.com/bio304-class/bio304-course-notes/master/datasets/titanic_data.csv")
+
+
+# Create a contingency table for Pclass and Survived
+contingency_table <- table(titanic$pclass, titanic$survived)
+
+# Print the contingency table
+contingency_table
+```
+
+This contingency table summarizes the counts of passengers in each combination of passenger class (1st, 2nd, 3rd) and survival status (No, Yes). It helps us understand how the survival rates vary by passenger class and whether there is a significant association between these two categorical variables.
+
+Here's the interpretation of the numbers in the table:
+
+-   In the first row (1st class):
+
+    -   123 passengers did not survive (0).
+
+    -   200 passengers survived (1).
+
+-   In the second row (2nd class):
+
+    -   158 passengers did not survive (0).
+
+    -   119 passengers survived (1).
+
+-   In the third row (3rd class):
+
+    -   528 passengers did not survive (0).
+
+    -   181 passengers survived (1).
+
+This table provides a breakdown of how many passengers from each class survived and did not survive. For example, you can see that a higher proportion of passengers from the 1st class survived compared to the 3rd class. Such contingency tables are useful for understanding the distribution and relationships between categorical variables in your data.
+
+You can further analyze contingency tables using statistical tests, such as the chi-squared test of independence, to determine whether the observed associations are statistically significant. Contingency tables are a valuable tool for exploring and summarizing relationships between categorical variables in a dataset.
+
+```{r}
+table(titanic$sex)
+```
+
+```{r}
+barplot(table(titanic$sex))
+```
+
+```{r}
+table(titanic$survived)
+```
+
+```{r}
+barplot(table(titanic$survived))
+```
+
+```{r}
+table_1 <- table(titanic$sex, titanic$survived)
+```
+
+```{r}
+addmargins(table_1)
+```
+
+```{r}
+addmargins(table_1)
+proportions(table_1, margin = 2)
+```
+
+```{r}
+barplot(table_1, legend.text = TRUE)
+```
+
+```{r}
+table_2 <- table(titanic$pclass, titanic$survived)
+addmargins(table_2)
+proportions(table_2, 1)
+proportions(table_2, 2)
+```
+
+```{r}
+barplot(table_2, legend.text = TRUE)
+```
+
+## Descriptive Statistics with Numeric Values
+
+### Descriptive Statistics with Continues Numerical Variables
+
+A histogram is a graphical representation of the distribution of continuous numerical data. It divides the data into intervals or bins and displays the frequency or count of data points falling into each interval as bars. Histograms are particularly useful when you want to understand the shape, central tendency, and spread of a dataset. Here's a more detailed explanation of histograms:
+
+**Histogram Characteristics:**
+
+-   **X-Axis:** Represents the range of values or intervals into which the data is divided.
+
+-   **Y-Axis:** Represents the frequency or count of data points in each interval.
+
+-   **Bars:** Vertical bars are drawn above each interval, with their heights corresponding to the frequency of data points in that interval.
+
+-   **Bins or Intervals:** These are the subranges into which the data is divided for analysis. The number of bins and their width can be adjusted to reveal different levels of detail in the distribution.
+
+**When to Use a Histogram:**
+
+-   Use a histogram when you have continuous numerical data with a relatively large sample size (typically 100 values or more).
+
+-   It helps visualize the distribution pattern, such as whether it's symmetric, skewed, bimodal, etc.
+
+-   It provides insights into the central location (mean or median) and spread (variance or standard deviation) of the data.
+
+-   Histograms are useful for identifying potential outliers or unusual patterns in the data.
+
+Now, let's use a dataset available in R base to create a histogram. We'll use the "faithful" dataset, which contains information about the Old Faithful geyser eruptions:
+
+```{r}
+# Load the "datasets" package to access the "faithful" dataset 
+data(faithful)
+# Create a histogram of the eruption durations (in minutes) 
+hist(faithful$eruptions, 
+     main="Histogram of Eruption Durations", 
+     xlab="Duration (Minutes)", 
+     ylab="Frequency")
+```
+
+In this example, we load the "faithful" dataset and create a histogram of the eruption durations. The histogram provides a visual representation of the distribution of eruption durations, helping us understand the pattern and characteristics of this continuous numerical variable.
+
+💡 Determining the number and width of bins (intervals) in a histogram is an important decision in the process of creating a meaningful and informative visualization. The choice of bins can significantly impact the appearance and interpretation of the histogram. Let's use the "faithful" dataset as an example to illustrate why determining bins is important:
+
+In the context of the "faithful" dataset, which records the durations of Old Faithful geyser eruptions, here are a few scenarios to consider:
+
+**Scenario 1: Too Few Bins (Under-Smoothing)**
+
+```{r}
+# Creating a histogram with too few bins 
+hist(faithful$eruptions, 
+     main="Histogram with Few Bins", 
+     xlab="Duration (Minutes)", 
+     ylab="Frequency", 
+     breaks = 5)
+```
+
+In this scenario, we've used too few bins (only 5). The histogram appears oversimplified, and we lose details about the distribution. It doesn't provide a clear picture of the underlying patterns in the data.
+
+**Scenario 2: Too Many Bins (Over-Smoothing)**
+
+```{r}
+# Creating a histogram with too many bins 
+hist(faithful$eruptions, 
+     main="Histogram with Many Bins", 
+     xlab="Duration (Minutes)", 
+     ylab="Frequency", 
+     breaks = 50)
+```
+
+Here, we've used too many bins (50). The histogram becomes too detailed, and it may introduce noise or make it difficult to discern the overall distribution pattern. It can also exaggerate minor fluctuations in the data.
+
+**Scenario 3: Optimal Number of Bins**
+
+```{r}
+# Creating a histogram with an appropriate number of bins (default) 
+hist(faithful$eruptions, 
+     main="Histogram with Default Bins", 
+     xlab="Duration (Minutes)", 
+     ylab="Frequency")
+```
+
+In this scenario, we've used the default number of bins (which R calculates based on a rule of thumb). The histogram strikes a balance between over-smoothing and under-smoothing. It reveals the essential characteristics of the data distribution, such as its bimodal nature.
+
+**Why Determining Bins Is Important:**
+
+-   **Clarity:** The choice of bins should make the distribution's key features (e.g., peaks, modes) readily apparent.
+
+-   **Detail:** It should provide enough detail to understand the distribution's nuances without overwhelming with excessive detail.
+
+-   **Interpretability:** The histogram should be easy to interpret and should not obscure important patterns.
+
+-   **Accuracy:** Bins should be chosen carefully to ensure that the histogram accurately represents the underlying data distribution.
+
+In summary, determining the appropriate number and width of bins in a histogram is essential for creating an informative visualization that effectively communicates the characteristics of the data. It requires finding a balance between oversimplification and excessive detail to make meaningful interpretations.
+
+### Statistical measures to describe the data
+
+1.  **Central Tendency:** Mean, Median, Mode
+2.  **Dispersion/Variation**: Range, standard deviation, variance
+3.  **Skewness:** Distribution plots (Histograms, bar plots)
+
+::: callout-note
+💡**Inferential Statistics** is about analyzing data (rather than summarizing it). It infers insights from the sample data for the whole population. That is, inferential statistic is to use sample data to make an inference or draw conclusion of the population. As such, inferential statistics use several statistical methods such as correlations, probability, regressions to determine how confidently we can draw conclusion about the population by relying on the sample data.
+:::
+
+```{r}
+library(here)
+load(here("data", "aflsmall.Rdata"))
+
+# these two data is about Autralian football league. afl.margins contains winning margin 
+# for all 176 games, afl.finalists contains names of the 400 teams that played finals
+# between 1987 to 2010. 
+
+table(afl.finalists) 
+# use table functions how many times an entry appears in a vector like data
+
+afl.margins
+
+
+```
+
+::: callout-tip
+⚠️This both output doesn't say much about the data we have here! does it? In order to understand much more about, we have to compute some descriptive statistics.
+:::
+
+Let's get start with a histogram of the afl.margins data, since it should help you get a sense of what the data we're trying to describe actually look like
+
+```{r}
+hist(afl.margins) # hist function plots an histogram for you! We would get into it a bit later, but take a note of the hist() function! 
+```
+
+## Measures of Central Tendency
+
+### Mean
+
+It is pure and simple: average! That is, add all the values up and then divide by the total numbers of observations!
+
+```{r}
+sum(afl.margins)/176
+
+mean(afl.margins)
+```
+
+### Median
+
+Median of a set of value of observations is just the middle value! (MIDLLE VALUE)
+
+```{r}
+median(afl.margins) 
+# since The middle values are both 30 and 31, so the median winning margin for 2010 was 30.5 points.
+```
+
+::: callout-important
+⚠️ The mean is basically the "centre of gravity" of the data set: if you imagine that the histogram of the data is a solid object, then the point on which you could balance it (as if on a see-saw) is the mean. In contrast, the median is the middle observation. Half of the observations are smaller, and half of the observations are larger.
+:::
+
+![](images/meanvsmedian.png)
+
+### Mode
+
+It is the value that occurs most!
+
+```{r}
+table(afl.finalists) # see the frequency table
+```
+
+::: callout-note
+What to use: Mean, Median, Mode?
+
+-   If your data is nominal scale, you are more likely to use Mode! (neither mean, nor median)
+
+-   If your data is ordinal scale, you are more likely to use median!
+
+-   Interval, or ratio scale data (without extreme values) use mean!
+:::
+
+::: callout-note
+💡**In a perfectly symmetrical distribution, the mean and the median are the same!**
+:::
+
+Overall, there is a systemic differences between mean, median when the histogram is asymmetric!
+
+![](images/symetric.png)
+
+## Visualization of Central Tendency
+
+A box plot (or box-and-whisker plot) is a graphical representation that displays the distribution of a dataset and provides a summary of its central tendency, spread, and potential outliers. It consists of a box that represents the interquartile range (IQR) and "whiskers" that extend from the box to the minimum and maximum values within a defined range.
+
+Here's a brief overview of the components of a box plot:
+
+-   **Box:** The box represents the IQR, which contains the middle 50% of the data. The lower boundary of the box is the first quartile (Q1), and the upper boundary is the third quartile (Q3). The width of the box indicates the spread of this middle 50%.
+
+-   **Whiskers:** The whiskers extend from the box to the minimum and maximum values within a specified range (usually 1.5 times the IQR). Data points outside this range are considered potential outliers and are plotted individually.
+
+-   **Outliers:** Individual data points that fall outside the whiskers are marked as dots and are considered outliers.
+
+A box plot is useful for identifying the central location, spread, and skewness of a dataset. It's also helpful for comparing the distribution of a variable across different groups, as in your case with "age" and "survived" groups.
+
+Here's an R code example to create a box plot of age by survival status using the "titanic" dataset:
+
+`{r} # Create a box plot of age by survival status boxplot(age ~ survived, data = titanic,          main = "Box Plot of Age by Survival Status",         xlab = "Survived (0 = No, 1 = Yes)",         ylab = "Age")}`
+
+This code will generate a box plot that visualizes the distribution of passenger ages for both survivors (1) and non-survivors (0). It can help you compare the age distributions of these two groups and identify any differences or patterns.
+
+## Measures of Variability
+
+This is all about how "spread out" are the data? How far away frm the mean/median do the observed values tend to be?
+
+### Range
+
+The biggest minus the smallest!
+
+```{r}
+
+min(afl.margins)
+max(afl.margins)
+range(afl.margins) # the easiest way
+```
+
+### Interquartile range
+
+IQR is the difference between 25th and 75th quantile!
+
+```{r}
+quantile(afl.margins, probs = .1)
+quantile(afl.margins, probs = .5)
+quantile(afl.margins, probs = .25)
+quantile(afl.margins, probs = .75)
+
+# then it is much more easier 
+quantile(afl.margins, probs = c(.25,.75))
+
+# or
+IQR(afl.margins)
+```
+
+::: callout-important
+⚠️It is easier to make sense of the range! Yet, when it is come to IQR, it should be thought as the range spanned by the middle half of the data. That is, one quater of the data falls below 25th percentile/quantile, one quarter of the data above the 75th percentile/quantile, leaving the middle half of the data lying between the two!
+:::
+
+### Variance & Standard Deviation (Mean absolute deviations)
+
+It tells how the values are spread across the data sample and it is the measure of the variation of the data points from the mean.
+
+**Steps to Calculate Variance & Standard Deviation**
+
+-   Find the mean, which is the arithmetic mean of the observations.
+
+-   Find the squared differences from the mean. (The data value - mean)^2^
+
+-   Find the average of the squared differences. (Variance = The sum of squared differences ÷ the number of observations)
+
+-   Find the square root of variance. (Standard deviation = √Variance)
+
+![](images/popvssamplevar.png)
+
+```{r}
+x <- c(2,6,5,3,2,3)
+sum(x)/length(x)  # or simply mean(x)
+y <- (x-(sum(x)/length(x)))
+z <- (y^2)
+sum(z)/(6-1) # variance 
+sqrt(sum(z)/(6-1)) # Standard deviation
+```
+
+```{r}
+sd(x)
+var(x)
+```
+
+![](images/exap_var_sd.png)
+
+::: callout-warning
+⚠️ R always take n-1 as a default, that is it calculates var or sd for sample! So, if you like to calculate mean for population, you have to write down the equation:
+
+(mean((x-mean(x))\^2) #variance )
+:::
+
+```{r}
+var(afl.margins)
+```
+
+::: callout-note
+💡Even though there is an elegance in the equation, variance has no human-friendly interpretation. It is a fundamental quantity for expressing variation, it's completely uninterpretable.
+:::
+
+```{r}
+sd(afl.margins)
+```
+
+::: callout-note
+💡 Interpreting standard deviations is slightly more complex. Because the standard deviation is derived from the variance, and the variance is a quantity that has little to no meaning that makes sense to us humans, the standard deviation doesn't have a simple interpretation. As a consequence, most of us just rely on a simple rule of thumb: in general, you should expect 68% of the data to fall within 1 standard deviation of the mean, 95% of the data to fall within 2 standard deviation of the mean, and 99.7% of the data to fall within 3 standard deviations of the mean.
+:::
+
+![](images/mean_.png)
+
+### Median Absolute Deviation
+
+MAD is a case where you use to meadian (not mean) to compute sd and var.
+
+```{r}
+mad(afl.margins) 
+```
+
+::: callout-note
+Where to use (range, IQR, sd, var)
+
+-   **Range**: Gives the full spread of data. It's vulnerable to outliers, and as a consequence it isn't often used unless you have a goo reasons to care about the extremes in the data.
+
+-   **IQR**: Tells you where the middle half of the data sits. Its pretty roboust, and complements the median nicely. This is used a lot!
+
+-   **MAD**: Not used very much!
+
+-   **Variance**: Tells you the average squared deviation from the mean! It is mathematically elegant, but uninterpretable.
+
+-   **Standard deviation**: This is square root of variance. In situations where the mean is the measure of central tendency, sd is the default! Therefore, sd is the by far the most popular and used measure of variation!
+:::
+
+## Skew and Kurtosis
+
+These are two more descriptive statistics you sometime see reported! They are less frequent in terms of useage though than the measure of central tendency and spread we have discussed.
+
+![](images/skew.png)
+
+**Skewness** is basically a measure of asymmetry.
+
+-   If data includes extreme small values, then the plot (histogram) would be negative skew (left-skew);
+
+-   If the data includes extreme big values, then the plot (histogram) would be positive skew (right-skew)
+
+```{r}
+hist(afl.margins)
+```
+
+**Kurtosis** is a measure of the pointiness of a data set.
+
+![](images/kurtosis.png)
+
+## Getting the overall summary of the data
+
+The basic idea behind the summary() function is that it prints out some useful information about whatever object. For numeric variables, we get a whole bunch of useful descriptive statistics. It gives us the minimum and maximum values (i.e., the range), the first and third quartiles (25th and 75th percentiles; i.e., the IQR), the mean and the median. In other words, it gives us a pretty good collection of descriptive statistics related to the central tendency and the spread of the data.
+
+```{r}
+summary(afl.margins)
+```
+
+::: callout-note
+💡If you have more several variables in your data, describe() function from psych package is much more handy!
+:::
+
+```{r}
+# get a data with several variables in it
+load(here("data", "clinicaltrial.Rdata"))
+
+# use summary function first
+summary(clin.trial)
+```
+
+So, Evidently there were three drugs: a placebo, something called "anxifree" and something called "joyzepam"; and there were 6 people administered each drug. There were 9 people treated using cognitive behavioural therapy (CBT) and 9 people who received no psychological treatment. And we can see from looking at the summary of the mood.gain variable that most people did show a mood gain (mean " .88), though without knowing what the scale is here it's hard to say much more than that.
+
+Let's see describe() function now
+
+```{r}
+library(psych) # install.packages("psych") if you don't have the package yet
+psych::describe(clin.trial)
+
+```
+
+::: callout-warning
+⚠️Notice that what the describe() function does is convert factors and logical variables to numeric vectors in order to do the calculations. These variables are marked with \* and most of the time, the descriptive statistics for those variables won't make much sense.
+:::
+
+There is even better version in which output now gives you means, standard deviations etc separately for the CBT group and the no.therapy group.
+
+```{r}
+psych::describeBy(clin.trial, group = clin.trial$therapy)
+```
+
+## Z-scores (standard scores)
+
+Z-scores, also known as standard scores, are a way to measure how far a particular value is from the average (mean) in a group of values. They help us understand whether a value is typical or unusual when compared to the group's average and how unusual it is.
+
+Here's a simple explanation of Z-scores and how to use them:
+
+**Z-Score Formula:** Z-Score = (Value - Mean) / Standard Deviation
+
+-   **Value**: The value you want to analyze.
+
+-   **Mean**: The average of all the values in the group.
+
+-   **Standard Deviation**: A measure of how spread out the values are from the mean.
+
+### **Using Z-Scores:**
+
+1.  **Understanding Typicality**: A Z-score tells you how many standard deviations a value is away from the mean. If the Z-score is 0, it means the value is exactly at the mean. Positive Z-scores indicate values above the mean, and negative Z-scores indicate values below the mean.
+
+2.  **Empirical Rule**: Z-scores help us apply the Empirical Rule:
+
+    -   About 68% of values are within 1 standard deviation of the mean.
+
+    -   About 95% of values are within 2 standard deviations of the mean.
+
+    -   About 99% of values are within 3 standard deviations of the mean.
+
+![](images/z_score.png)
+
+### **Examples of How to Use Z-Scores:**
+
+1.  **Exam Scores**: Suppose the average score on a test is 75, and the standard deviation is 10. If a student scores 85, their Z-score would be (85 - 75) / 10 = 1. This means their score is 1 standard deviation above the average, which is a good performance.
+
+2.  **Height**: For a group of people with an average height of 170 cm and a standard deviation of 10 cm, someone who is 190 cm tall would have a Z-score of (190 - 170) / 10 = 2. This indicates they are 2 standard deviations above the average, which is relatively tall.
+
+3.  **Stock Market**: In finance, Z-scores are used to assess the risk of a stock. If a stock's Z-score is negative, it might indicate financial distress. For example, a Z-score of -2 suggests the company's financial situation is 2 standard deviations below the norm.
+
+In essence, Z-scores provide a standardized way to compare values across different datasets. They help us identify outliers and assess how unusual or typical a data point is in relation to the mean and standard deviation of a group.
+
+### More on Z-scores
+
+Let's use the built-in "mtcars" dataset in R to calculate Z-scores for one of its variables and answer some statistical questions. We'll calculate Z-scores for the "mpg" (miles per gallon) variable.
+
+```{r}
+# Load the mtcars dataset
+data(mtcars)
+
+# Calculate the mean and standard deviation of mpg
+mean_mpg <- mean(mtcars$mpg)
+std_dev_mpg <- sd(mtcars$mpg)
+
+# Calculate Z-scores for each observation in mpg
+z_scores_mpg <- (mtcars$mpg - mean_mpg) / std_dev_mpg
+
+# Print the first few Z-scores
+head(z_scores_mpg)
+
+```
+
+This code calculates Z-scores for the "mpg" variable in the "mtcars" dataset. Now, let's answer some statistical questions:
+
+**1. What is the average (mean) Z-score for mpg in the dataset?**
+
+```{r}
+mean_z_score <- mean(z_scores_mpg)
+mean_z_score
+```
+
+**2. How many cars in the dataset have above-average mpg (Z-score \> 0)?**
+
+```{r}
+above_average_mpg <- sum(z_scores_mpg > 0)
+above_average_mpg
+
+```
+
+**3. How many cars in the dataset have below-average mpg (Z-score \< 0)?**
+
+```{r}
+below_average_mpg <- sum(z_scores_mpg < 0)
+below_average_mpg
+
+```
+
+**4. How many cars in the dataset have very high mpg (Z-score \> 2)?**
+
+```{r}
+very_high_mpg <- sum(z_scores_mpg > 2)
+very_high_mpg
+```
+
+These examples demonstrate how you can calculate Z-scores for a variable in R, use them to answer statistical questions, and identify data points that fall within certain Z-score ranges.
+
+## Correlation
+
+Correlation is **a statistical measure that expresses the extent to which two variables are linearly related** (meaning they change together at a constant rate). It's a common tool for describing simple relationships without making a statement about cause and effect.
+
+![](images/cor.png)
+
+Let's get a new data to dive into it:
+
+```{r}
+# get the data
+load(here("data", "parenthood.Rdata"))
+
+# look at the data
+str(parenthood)
+```
+
+```{r}
+summary(parenthood)
+```
+
+```{r}
+hist(parenthood$dan.sleep)
+hist(parenthood$baby.sleep)
+hist(parenthood$dan.grump)
+```
+
+### The strength and direction of a relationship
+
+```{r}
+plot(parenthood$dan.sleep, parenthood$dan.grump)
+```
+
+```{r}
+plot(parenthood$baby.sleep, parenthood$dan.grump)
+```
+
+```{r}
+cor(parenthood$dan.sleep, parenthood$dan.grump)
+```
+
+```{r}
+cor(parenthood)
+```
+
+::: callout-caution
+💡 So how should you interpret a correlation of, say r " .4? The honest answer is that it really depends on what you want to use the data for, and on how strong the correlations in your field tend to be. Yet, this could be a guide for interpretation:
+
+![](images/cor2.png)
+:::
+
+```{r}
+# correlation is not causation
+load(here("data", "anscombesquartet.Rdata"))
+
+cor(X1,Y1) 
+cor(X2,Y2)
+cor(X3,Y3)
+cor(X4,Y4)
+```
+
+You'd think that these four data setswould look pretty similar to one another. They do not.
+
+```{r}
+plot(X1,Y1)
+```
+
+```{r}
+plot(X2,Y2)
+```
+
+```{r}
+plot(X3,Y3)
+```
+
+```{r}
+plot(X4,Y4)
+```
+
+::: callout-tip
+⚠️ Anscombe's quartet. All four of these data sets have a Pearson correlation of r " .816, but they are qualitatively different from one another.
+
+Always check out scatter-plot!
+:::
+
+::: callout-caution
+💡R cor() function computes Pearson Correlation by default. Perason Correlation coefficient is uselful for a lot of things, but it does have a shortcomings! It measures the strength of a linear relationship between two variables. When the relationhsip is not linear (that's why you have to look the scatter-plot first), you have to use other types of correlation such as Spearman's rank or kendall correlations.
+:::
+
+```{r}
+load(here("data", "effort.Rdata"))
+str(effort)
+```
+
+```{r}
+
+plot(effort, type="b", col="red")
+
+```
+
+```{r}
+cor(effort) # strong correlation, isn't it? 
+```
+
+::: callout-caution
+⚠️there is a perfect ordinal relationship here. That is, if student 1 works more hours than student 2, then we can guarantee that student 1 will get the better grade. That's not what a correlation of r " .91 says at all.
+
+How should we address this? Actually, it's really easy: if we're looking for ordinal relationships, all we have to do is treat the data as if it were ordinal scale! So, instead of measuring effort in terms of "hours worked", lets rank all 10 of our students in order of hours worked.
+:::
+
+![](images/cor_ex1.png)
+
+This is basically to say that these two rankings are identical, so if we now correlate them we get a perfect relationship.
+
+```{r}
+hours.rank <- rank(effort$hours)
+grade.rank <- rank(effort$grade)
+
+# now check out the correlation
+cor(hours.rank, grade.rank)
+```
+
+There is a simple version of this looking at ordinal relationship, which is spearman correlation
+
+```{r}
+cor(effort$hours, effort$grade, method = "spearman")
+```
+
+::: callout-warning
+⚠️cor() function only works with numeric values! So, if your data has any factor variables, it wouldn't work out!
+:::
+
+```{r}
+load(here("data", "work.Rdata"))
+str(work)
+```
+
+```{r}
+#try cor()  function
+# cor(work)
+```
+
+In this type of situation, you have to subset the data or find other work-around! One of such work-around is correlation() function from lsr package, that would compute correlation for any data!
+
+```{r}
+# here is a work around
+library(lsr) # install.packages("lsr") if you dont have the package yet! 
+correlate(work)
+```
+
+## Missing Data
+
+Real data sets very frequently turn out to have missing values. Let's start with the simplest case, in which you're trying to calculate descriptive statistics for a single variable which has missing data.
+
+```{r}
+partial <- c(10,20,NA,30)
+```
+
+```{r}
+mean(partial)
+```
+
+To fix this, all of the descriptive statistics functions that I've discussed in this chapter (with the exception of cor() which is a special case I'll discuss below) have an optional argument called na.rm, which is shorthand for "remove NA values". By default, na.rm = FALSE, so R does nothing about the missing data problem. Let's try setting na.rm = TRUE
+
+```{r}
+mean(partial, na.rm = TRUE)
+```
+
+::: callout-note
+⚠️Remember, cor() function is an exeption. You have to decide what to do with NA, when you are using cor() function
+:::
+
+```{r}
+#lets get a data with some missing values
+load(here("data", "parenthood2.Rdata"))
+str(parenthood2)
+```
+
+```{r}
+# let's try to do cor()
+cor(parenthood2)
+```
+
+To make R behave more sensibly in this situation, you need to specify the use argument to the cor() function. There are several different values that you can specify for this, but the two that we care most about in practice tend to be "complete.obs" and "pairwise.complete.obs". If we specify use = "complete.obs", R will completely ignore all cases (i.e., all rows in our parenthood2 data frame) that have any missing values at all. So, for instance, if you look back at the extract earlier when I used the head() function, notice that observation 1 (i.e., day 1) of the parenthood2 data set is missing the value for baby.sleep, but is otherwise complete? Well, if you choose use = "complete.obs" R will ignore that row completely: that is, even when it's trying to calculate the correlation between dan.sleep and dan.grump, observation 1 will be ignored, because the value of baby.sleep is missing for that observation. Here's what we get:
+
+```{r}
+cor(parenthood2, use = "complete.obs")
+```
+
+The other possibility that we care about, and the one that tends to get used more often in practice, is to set use = "pairwise.complete.obs". When we do that, R only looks at the variables that it's trying to correlate when determining what to drop. So, for instance, since the only missing value for observation 1 of parenthood2 is for baby.sleep R will only drop observation 1 when baby.sleep is one of the variables involved: and so R keeps observation 1 when trying to correlate dan.sleep and dan.grump. When we do it this way, here's what we get:
+
+```{r}
+cor(parenthood2, use = "pairwise.complete.obs")
+```
+
+## Summary
+
+Calculating some basic descriptive statistics is one of the very first things you do when analysing real data, and descriptive statistics are much simpler to understand than inferential statistics. In this lecture, we talked about the following topics:
+
+-   **Measures of central tendency.** Broadly speaking, central tendency measures tell you where the data are. There's three measures that are typically reported in the literature: the mean, median and mode.
+
+-   **Measures of variability.** In contrast, measures of variability tell you about how "spread out" the data are. The key measures are: range, standard deviation, interquartile range.
+
+-   **Getting summaries** of variables in R. Since this book focuses on doing data analysis in R, we spent a bit of time talking about how descriptive statistics are computed in R.
+
+-   **Standard scores.** The z-score is a slightly unusual beast. It's not quite a descriptive statistic, and not quite an inference. Make sure you understand the basic! it'll come up again later.
+
+-   **Correlations.** Want to know how strong the relationship is between two variables? Calculate a correlation.
+
+-   **Missing data.** Dealing with missing data is one of those frustrating things that data analysts really wish the didn't have to think about. In real life it can be hard to do well.
