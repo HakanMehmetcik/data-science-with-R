@@ -1,5 +1,5 @@
 ---
-title: "simple_linear_regression_exercise"
+title: "Inferenatial Statistics: Regression"
 author: "Hakan Mehmetcik"
 format: pdf
 editor: visual
@@ -9,357 +9,6 @@ execute:
   output: asis
 df-print: kable
 ---
-
-## Inferential Statistics
-
-After having a summary of the data via descriptive statistics, we would answer questions using statistical inference (inferential statistics). In fact, descriptive statistics is one of the smallest parts of statistics, and one of the least powerful. The bigger and more useful part of statistics is inferential statistics that lets you make inferences about data.
-
-::: callout-note
-💡 **Inferential statistics** involves making conclusions about a larger group (or population) based on a smaller group (or sample) drawn from it. This is incredibly useful because it's often impractical or impossible to collect data from every single member of a population.
-
-Inferential statistics is also traditionally divided into two main areas: **estimation and hypothesis testing**.
-
--   **Estimation:** This involves using sample data to estimate the value of an unknown parameter of the population. For instance, if you wanted to know the average height of all adults in a city, you might measure the heights of a sample group from the city. An estimate from this sample, like the average height of these sampled individuals, helps predict the average height of all adults in the city. Estimation can be of two types:
-
-    -   **Point estimation** provides a single best guess for a parameter (like the average height).
-
-    -   **Interval estimation** gives a range within which the parameter likely falls (for instance, the average height is between 5 feet 7 inches and 5 feet 9 inches, with a certain level of confidence).
-
--   **Hypothesis Testing:** This is about making decisions or testing claims about a population based on sample data. For example, suppose a fast-food franchise claims that their service time is less than 5 minutes on average. You might test this claim by sampling some service times at various outlets. Hypothesis testing involves: Setting up two opposing statements (hypotheses): one that represents the claim (e.g., average service time is less than 5 minutes) and one that represents the alternative (e.g., average service time is 5 minutes or more). Analyzing sample data to see which statement is more likely to be true, given the data.
-
-    Both estimation and hypothesis testing are tools that help us draw conclusions about a population based on sample observations. They use the principles of probability to account for the fact that sampling naturally involves some amount of random variation. This way, even if the sample isn't exactly representative of the whole population, we can still make reasonably accurate and confident predictions about the population.
-:::
-
-## Random Variables and Probability Distributions
-
-When we speak of numeric variables, we are actually speaking of a **random variable**, which is a numeric summary of a random phenomenon.
-
-**A discrete random variable** is one that has countable numbers of outcomes, while **continiues random variable** is a random varibale with an uncountable numbers of outcomes.
-
-Examples of discrete random variables include **the number of children in a family**, the Friday night attendance at a cinema, the number of patients in a doctor's surgery, the number of defective light bulbs in a box of ten.
-
-The **mass, temperature, energy, speed, length**, and so on are all examples of continuous variables.
-
-**A probability Distribution** is a summary of a random variable that gives all possible values of the random variable along with their probability of occurring.
-
-![](images/Discrete-and-continuous-random-variables.png)
-
-## R has a function for
-
-![](images/Screenshot%202022-12-06%20at%2022.23.51.png)
-
-## The Normal Distribution (Gaussian Distribution)
-
-Normal distribution is one of the most important distribution in statistics. Normal distribution is known as "the bell curve" or a "Gaussian distribution" too.
-
-The normal distribution is symmetric, uni modal, and it is a distribution for numeric continuous variable.
-
-In normal distribution there are two parameters:
-
--   the parameter mean (defines the center)
-
--   the variance (or sd) (defines the spread)
-
-The area **under the curve** tells you the probability that an observation falls within a particular range. The solid lines plot normal distributions with mean μ " 0 and standard deviation σ " 1. The shaded areas illustrate "areas under the curve" for two important cases. In panel a, we can see that there is a 68.3% chance that an observation will fall within one standard deviation of the mean. In panel b, we see that there is a 95.4% chance that an observation will fall within two standard deviations of the mean.
-
-![](images/Screenshot%202022-12-06%20at%2022.41.15.png)
-
-![](images/Screenshot%202022-12-06%20at%2022.41.44.png)
-
-## Sampling Distributions
-
-In almost every situation of interest, what we have available to us as researchers is a sample of data. We might have run experiment with some number of participants; a polling company might have phoned some number of people to ask questions about voting intentions; etc. Regardless: the data set available to us is finite, and incomplete.
-
-Statistics are numbers that are calculated from sample and that generally speaking estimate parameters. For exm, sample mean x(\^) estimates the population mean u, sample proportion p(\^) estimates the population proportion.
-
-What kinds of things would we like to learn about? And how do we learn them? These are the questions that lie at the heart of inferential statistics, and they are traditionally divided into two "big ideas": estimation and hypothesis testing.
-
-#### An Example for Sampling
-
-```{r}
-# Lets make fake IQ scores
-set.seed(178)
-IQ <- rnorm(n=1000, mean=100, sd=15) # generate IQ scores
-IQ <- round(IQ) # IQs are whole numbers
-
-summary(IQ)
-```
-
-```{r}
-# let's now have 5 samples out of this
-IQ.five1 <- round(rnorm(5, mean = 100, sd=15))
-IQ.five2 <- round(rnorm(5, mean = 100, sd=15))
-IQ.five3 <- round(rnorm(5, mean = 100, sd=15))
-IQ.five4 <- round(rnorm(5, mean = 100, sd=15))
-IQ.five5 <- round(rnorm(5, mean = 100, sd=15))
-
-replication <- as.data.frame(rbind(IQ.five1, IQ.five2, IQ.five3, IQ.five4, IQ.five5))
-replication$mean <-  apply(replication[,-1], 1, mean) # add rowwise mean 
-replication
-```
-
-## **The Central limit theorem (CLT)**
-
-The Central Limit Theorem (CLT) is a fundamental concept in statistics that helps explain why many distributions in the real world tend to resemble a bell-shaped curve known as the normal distribution, especially as more data points are considered.
-
-Let's take and example:
-
-Imagine you're at a large family reunion and you want to know the average age of all attendees. Instead of asking everyone their age (which might be time-consuming and impractical), you decide to randomly select groups of, say, 30 family members and calculate the average age of each group.
-
-You do this multiple times, creating several groups of 30 and calculating the average age for each group. Now, if you were to create a chart (a histogram) of all these averages, the CLT tells us that this chart will likely resemble a bell-shaped curve (the normal distribution), regardless of the actual age distribution of all your family members.
-
-The key points about the Central Limit Theorem are:
-
-It applies when you are looking at averages or sums of a sample. In our example, we were looking at the average age of groups. The larger the sample size used in each group, the more the distribution of these averages will resemble a normal distribution. Even if the original data (ages of all attendees) are not normally distributed, the distribution of the averages will tend to be normal as the sample size increases. This tendency towards a normal distribution happens regardless of the shape of the original data distribution. Whether the actual ages are skewed to the left or right, or even if they follow no apparent pattern at all, the average ages calculated over many samples will form a normal distribution. Why is this useful? The CLT is powerful because it allows statisticians to make inferences and conduct hypothesis tests using the normal distribution. This is beneficial because the properties of the normal distribution are well-understood and can be applied to many real-world scenarios, making it easier to predict probabilities and make decisions based on sample data.
-
-**How about another example:**
-
-```{r}
-hist(IQ.five1)
-hist(IQ)
-```
-
-::: callout-note
-👋 no matter what shape your population distribution is, as N increases the sampling distribution of the mean starts to look more like a normal distribution!
-:::
-
-Thus, Central Limit theorem basically suggest that:
-
-• The mean of the sampling distribution is the same as the mean of the population
-
-• The standard deviation of the sampling distribution (i.e., the standard error) gets smaller as the
-
-sample size increases
-
-• The shape of the sampling distribution becomes normal as the sample size increases.
-
-![](images/Screenshot%202022-12-13%20at%2020.10.53.png)
-
-![](images/Screenshot%202022-12-13%20at%2020.10.53.png)
-
-## Estimating Population Parameters
-
-It is all about the procedure for estimating population parameters from a sample of data. How to do that?
-
-![](images/1_6.jpg)
-
-### The mean of the sampling distribution is the same as the mean of the population
-
-First guess is about the estimation of population mean. This exactly equals to sample mean. As simple as it is!
-
-![](images/Screenshot%202022-12-13%20at%2020.17.01.png)
-
-```{r}
-IQ.2 <- round(rnorm(10000, mean = 100, sd=15))
-sample1 <- sample(IQ.2,10)
-mean1 <- mean(sample1)
-sample2 <- sample(IQ.2,10)
-mean2 <- mean(sample2)
-sample3 <- sample(IQ.2,10)
-mean3 <- mean(sample3)
-sample4 <- sample(IQ.2,10)
-mean4 <- mean(sample4)
-sample5 <- sample(IQ.2,10)
-mean5 <- mean(sample5)
-sample6 <- sample(IQ.2,10)
-mean6 <- mean(sample6)
-sample7 <- sample(IQ.2,10)
-mean7 <- mean(sample7)
-sample8 <- sample(IQ.2,10)
-mean8 <- mean(sample8)
-sample9 <- sample(IQ.2,10)
-mean9 <- mean(sample9)
-sample10 <- sample(IQ.2,10)
-mean10 <- mean(sample10)
-sample11 <- sample(IQ.2,10)
-mean11 <- mean(sample11)
-sample12 <- sample(IQ.2,10)
-mean12 <- mean(sample12)
-sample13 <- sample(IQ.2,10)
-mean13 <- mean(sample13)
-sample14 <- sample(IQ.2,10)
-mean14 <- mean(sample14)
-sample15 <- sample(IQ.2,10)
-mean15 <- mean(sample15)
-sample16 <- sample(IQ.2,10)
-mean16 <- mean(sample16)
-sample17 <- sample(IQ.2,10)
-mean17 <- mean(sample17)
-sample18 <- sample(IQ.2,10)
-mean18 <- mean(sample18)
-sample19 <- sample(IQ.2,10)
-mean19 <- mean(sample19)
-sample20 <- sample(IQ.2,10)
-mean20 <- mean(sample20)
-sample21 <- sample(IQ.2,10)
-mean21 <- mean(sample21)
-sample22 <- sample(IQ.2,10)
-mean22 <- mean(sample22)
-sample23 <- sample(IQ.2,10)
-mean23 <- mean(sample23)
-sample24 <- sample(IQ.2,10)
-mean24 <- mean(sample24)
-sample25 <- sample(IQ.2,10)
-mean25 <- mean(sample25)
-sample26 <- sample(IQ.2,10)
-mean26 <- mean(sample26)
-sample27 <- sample(IQ.2,10)
-mean27 <- mean(sample27)
-sample28 <- sample(IQ.2,10)
-mean28 <- mean(sample28)
-sample29 <- sample(IQ.2,10)
-mean29 <- mean(sample29)
-sample30 <- sample(IQ.2,10)
-mean30 <- mean(sample30)
-
-(mean1+mean2+mean3+mean4+mean5+mean6+mean7+mean8+mean9+mean10+mean11+mean12+mean13+mean14+mean15+mean16+mean17+mean18+mean19+mean20+mean21+mean22+mean23+mean24+mean25+mean26+mean27+mean28+mean29+mean30)/30
-```
-
-![](images/Screenshot%202022-12-13%20at%2020.43.36.png)
-
-::: callout-note
-⚠️ Central Limit Theorem only works:
-
-1.  Random Sampling
-2.  Normal Distribution
-    1.  if not, take at least 30 sample!: If the population is not normally distributed, the sample size should be at least 30, according to the Central Limit Theorem, in order to have a sampling distribution that is approximately normal.
-3.  Independence condition
-    1.  sampling with replacement , then we are ok!
-
-    2.  sampling without replacement (the 10% **rule!):** If you are sampling without replacement, you typically can't use the Central Limit Theorem unless your sample size is less than or equal to 10% of the population. This is known as the 10% rule.
-
-### Sampling Procedure
-
-**Simple Random sample**: Selecting black or white chips from a box without replacement
-
-![](images/Screenshot%202022-12-06%20at%2023.04.00.png)
-
-![![](images/Screenshot%202022-12-06%20at%2023.06.46.png)](images/Screenshot%202022-12-06%20at%2023.04.00.png)
-
-![](images/Screenshot%202022-12-06%20at%2023.06.46.png)
-
-⚠️ Most samples are not simple random sample! More generally though, it's important to remember that random sampling is a means to an end, not the end in itself.
-:::
-
-## Point estimation
-
-The thing that has been missing from this discussion is an attempt to quantify the amount of uncertainty that attaches to our estimate. It's not enough to be able guess that, say, the mean IQ of undergraduate statistic students is 115 (yes, I just made that number up). We also want to be able to say something that expresses the degree of certainty that we have in our guess. For example, it would be nice to be able to say the chance of having a 89 IQ score for a random pick among these students!
-
-```{r}
-# Let's recall IQ score data we have cretaed
-
-# Point Estimation
-mean_est <- mean(IQ) # Mean IQ score
-sd_est <- sd(IQ) # Standard deviation of IQ scores
-
-# Probability calculation for if a student has 89 IQ score among this sample
-prob <- pnorm(89, mean=mean_est, sd=sd_est)
-
-# Print result
-print(paste("The probability of a random student having an IQ of 89 or less is:", prob))
-
-
-```
-
--   The **`pnorm`** function is used to calculate the probability of a random student having an IQ of 89. This function gives the cumulative distribution function for the normal distribution.
-
--   You can also do this with calculating z score
-
-```{r}
-# it is much easier if you use pnorm function, yet z-score functions works too! 
-z_score <- function(x,y,s) {
- (x-y)/s
-} 
-z_score_est <- z_score(89,mean_est,sd_est)
-prob <- pnorm(z_score_est)
-
-# Print result
-print(paste("The probability of a random student having an IQ of 89 or less is:", prob))
-```
-
-So, what is the difference?
-
-In statistics, the `pnorm` function in R is used to calculate the cumulative distribution function (CDF) for a normal distribution. If you know the true population mean (μ) and standard deviation (σ), you can use the `pnorm` function directly to calculate probabilities.
-
-Here's an example:
-
-```{r}
-# True population parameters
-mu <- 100
-sigma <- 15
-
-# Calculate the probability that a random variable X is less than 110
-prob <- pnorm(110, mean=mu, sd=sigma)
-
-# Print the result
-print(paste("The probability that X < 110 is:", prob))
-```
-
-However, if you don't know the true population parameters and you're working with sample data, you would typically use the z-score and critical z-values for your calculations. The z-score standardizes your data to a standard normal distribution (mean = 0, sd = 1), which allows you to calculate probabilities using the standard normal table.
-
-Here's an example:
-
-```{r}
-# Sample data
-data <- rnorm(n=30, mean=100, sd=15)
-
-# Calculate the sample mean and standard deviation
-x_bar <- mean(data)
-s <- sd(data)
-
-# Calculate the z-score for a value of 110
-z <- (110 - x_bar) / (s / sqrt(length(data)))
-
-# Calculate the probability that the sample mean is less than 110
-prob <- pnorm(z)
-
-# Print the result
-print(paste("The probability that the sample mean < 110 is:", prob))
-```
-
-In this code, `pnorm(z)` gives the probability that a standard normal random variable is less than `z`.
-
-How about looking at greater than values! Simple, isn't it?
-
-```{r}
-
-# Calculate the probability that a standard normal random variable is greater than z
-prob <- 1 - pnorm(z)
-
-# Print the result
-print(paste("The probability that a standard normal random variable is greater than", z, "is:", prob))
-
-```
-
-## Estimating a confidence Interval
-
-Another example, it would be nice to be able to say the probability that a randomly selected student's IQ will between two values.
-
-```{r}
-
-# Interval Estimation
-alpha <- 0.05 # significance level for a 95% confidence interval
-error <- qnorm(1 - alpha/2) * sd_est/sqrt(length(IQ)) # margin of error
-
-lower_bound <- mean_est - error # lower bound of the confidence interval
-upper_bound <- mean_est + error # upper bound of the confidence interval
-
-
-# Print results
-print(paste("95% Confidence Interval for Mean IQ: (", lower_bound, ",", upper_bound, ")"))
-
-```
-
-ok, the probability that a randomly selected student's IQ will be between 89 to 101?
-
-```{r}
-# having 89
-having_89 <- pnorm(89, mean_est, sd_est)
-having_101 <- pnorm(101, mean_est, sd_est)
-
-# print 
-cat("The chance for having a random pick between 89 and 101 is:",  having_101 - having_89)
-```
 
 # Functions and Models
 
@@ -399,9 +48,7 @@ No, beacuse when F=57 R=750 or R=1250.
 
 💡 A function is generally denoted by f(x) where x is the input. For example, in the function f(x) = x\^2, the function f(x) takes the value of "x" and then squares it!
 
-::: callout-note
 👋 In statistics, **a distribution is a function that shows the possible values for a variable and how often they occur**. It's a description of the relative numbers of times each possible outcome will occur in a number of trials. Distributions can be represented in various ways, such as with graphs or probability tables.
-:::
 
 # Simple Linear Regression
 
@@ -421,7 +68,6 @@ With regression, you can predict the values of the response variable with the us
 
 **multiple linear/logistic regression:** when there is more than one explanatory variable
 
-::: callout-note
 💡 Here is a a list of possible linear relations:
 
 ![](images/clipboard-832738691.png)
@@ -459,7 +105,6 @@ In this code, `lm(y ~ x)` fits a linear model to the data with `y` as the respon
 -   **Multiple R-squared**: This is the proportion of variance in the response variable that can be explained by the predictor variables. It provides a measure of how well the model fits the data.
 
 -   **F-statistic and p-value**: The F-statistic is a measure of how much better the model fits the data than a model that has no predictor variables. The p-value associated with this F-statistic is the probability of observing such an F-statistic, or one more extreme, under the null hypothesis that the model with no predictor variables fits the data as well as our model.
-:::
 
 ## Exercise 1:
 
@@ -1027,13 +672,11 @@ abline(reg = taiwan_model, col="red")
 
 ### 
 
-::: callout-note
 💡Remember that
 
 The intercept is the y-value when x equals zero.
 
 The slope is the rate of change in the y direction divided by the rate of change in the x direction.
-:::
 
 ```{r}
 summary(taiwan_model)

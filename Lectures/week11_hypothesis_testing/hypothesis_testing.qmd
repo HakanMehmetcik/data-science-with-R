@@ -1,0 +1,204 @@
+---
+title: "Inferenatial Statistics: Hypothesis Testing"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: true
+  output: asis
+df-print: kable
+---
+
+## Test of Significance (Single Sample Inference)
+
+Suppose that we want to hypothesize that the mean number of TV hours watched per week is 28.5; we'll define this as our null hypothesis, Ho.
+
+Let's assume that we only have access to a subset of household data, from which we can estimate the population mean and standard error of the sample
+
+```{r}
+x <- c(25.7, 38.5, 29.3, 25.1, 30.6, 34.6, 30.0, 39.0, 33.7, 31.6, 
+       25.9, 34.4, 26.9, 23.0, 31.1, 29.3, 34.5, 35.1, 31.2, 33.2, 
+       30.2, 36.4, 37.5, 27.6, 24.6, 23.9, 27.0, 29.5, 30.1, 29.6, 
+       27.3, 31.2, 32.5, 25.7, 30.1, 24.2, 24.1, 26.4, 31.0, 20.7, 
+       33.5, 32.2, 34.7, 32.6, 33.5, 32.7, 25.6, 31.1, 32.9, 25.9)
+
+mean.x <- mean(x)
+SE.x <- sd(x)/ sqrt(length(x))
+```
+
+The arithmetic mean of x is 30.14 which is slightly different from our hypothesized value of 28.5. This begs question: is this difference significant, or is it due to chance variation alone?
+
+What would you say?
+
+### The null and alternative hypothesis
+
+The objective of hypothesis testing is to assess whether the observed data are consistent with a well specified (hypothesized) random process, Ho.
+
+> Ho: = 28.5 Ha: ≠ 28.5
+
+Ho is a statement about the true nature of things. To assess whether our observed data are consistent with our null hypothesis we seek to compare our data with the hypothesized value.
+
+In essence, we compare our observed data (usually as a statistical summary) to the hypothesized distribution using a *test statistic* from which a *test of significance* is calculated (this tells us how likely our observed statistic agrees with our hypothesized process). These, and derived concepts, are highlighted in the subsequent sections.
+
+### Test Statistics
+
+A **test statistic** is a numerical summary of the data that is compared to what would be expected under the null hypothesis. Test statistics can take on many forms such as the **z-tests** (usually used for large datasets) or t-tests (usually used when datasets are small)
+
+#### Z-tests
+
+The **z-statistic** is a measure of how much an observed statistic differs from an expected statistic put forward by the null hypothesis. It is computed as
+
+z= (observed-expected) / SE
+
+In computing the z-statistic, the SE used is not standard error of the observed data, but the standard error for the null. To be more precise, the SE in this formula is computed from the null's SD, if given. However, in many cases, the null's SD can only be estimated from the observed data's SD.
+
+In R, pnorm() function computes the z-statistic.
+
+```{r}
+Ho <- 28.5
+z <- (mean.x-Ho) / SE.x
+P.Ho <- pnorm(z, lower.tail = FALSE)
+P.Ho
+```
+
+Here, z is on the right side of the curve and the probability of getting a test statistic more extreme than our z is about **0.003** or 0.31% . P is called the **observed significance level** and is sometimes referred to as the P-value. The *smaller* this probability, the *stronger* the evidence against Ho meaning that the odds of the mean TV hours watched per household being 28.5 is very small. Careful, P **is not** the chance of Ho being right, such statement is prevalent but is *wrong*.
+
+Sometimes researchers will define a P value for which Ho will be rejected. Such value is usually referred to as the αvalueαvalue. If such a test is requested, we must determine if the test is **one-tailed** or **two-tailed**. A test is *one-tailed* if the alternate hypothesis, Ha, is of the form "greater than" or "less than" (e.g. the mean number of TV hours watched *are greater than* 28.5). A test is *two-tailed* if Ha is *not* of the form "greater than" or "less than"
+
+Here are a few examples:
+
+-   If we chose an α value of 0.05 and we wanted to test the hypothesis that our observed mean hours is **different** than Ho we would define a **two-tailed** test, meaning that we would have to define rejection regions associated with P values of *less than* 0.025 and *greater than* 0.975 (or z values of -1.96 and 1.96 respectively). The reason we choose p values of 0.025/0.975 and not 0.05/0.95 is because we need to split the 0.05 α value across *both* tails of the curve (remember that we are rejecting the null if our z value falls in *either* tails of the curve).
+
+![](images/image-369121377.png)
+
+-   If we chose an α value of 0.05 and we wanted to test the hypothesis that our observed mean hours is **greater** than Ho, we would define a **one-tailed** test, meaning that we would have to define a rejection region associated with a Pvalue *greater than* 0.95.
+
+![](images/image-1999344459.png)
+
+## t-tests
+
+When working with small sample sizes (typically less than 30), the z-test has to be modified. For starters, the shape of the sampling distribution (i.e. the distribution of means one would compute from many different samples from the same underlying population) now depends on the shape of the underlying population distribution which must therefore be approximately normal in shape. These requirements can be quite restrictive because in most cases we do not know the population's distribution.
+
+Continuing with our working example, let's assume that instead of a sample size of 50 we now have a sample size of 10.
+
+```{r}
+x2 <- c(37.13, 32.02, 26.05, 31.76, 31.90, 38.62, 21.63, 40.75, 31.36, 27.01)
+mean.x2 <- mean(x2)
+SD.x2 <- sd(x2)
+SE.x2 <- sd(x2)/sqrt(x2)
+t.val <- (mean.x2-Ho) / SE.x2
+```
+
+The next step is to compute the P-value. We will compute P using both the normal distribution curve (which we normally do for a large sample) and *Student's* curve (which is recommended for a small sample).
+
+```{r}
+P.Ho.norm <- pnorm(t.val, lower.tail = FALSE)
+P.Ho.stud <- pt(t.val, df=length(x2)-1, lower.tail = FALSE)
+P.Ho.norm
+P.Ho.stud
+```
+
+## The Idea of testing Hypotheses
+
+One of the most common form of inferential statistics is hypotheses testing. Simple enough, hypotheses testing is a class of procedures that use sample data to examine a claim about the population parameters.
+
+In this way, hypothesis testing is something akin to a court case. In court cases, a defendant is put on trial, and this defendant is assumed innocent until their guilt is proven. The burden of proof is on the prosecution, who must prove that the defendant is guilty beyond the shadow of a reasonable doubt. In hypothesis testing, we place some claim on trial and assume that the claim is true until proven otherwise.
+
+## Research hypotheses vs statistical hypotheses
+
+1.  listening to music reduces your ability to pay attention to other things. (A causal relationship between listening to music and attention to things)
+2.  Intelligence is related to personality. (May be correlational but not causal)
+3.  Intelligence şs speed of information processing ( not correlational, not causal, just to define what a particular thing is.) (not what does X effect on Y but what is X? )
+4.  Love is a battlefield? (nothing testable)
+
+All these, can be (some of the certainly vaugue) research hypotheses or scientific claims. Yet, none of them actually a statistical hypotheses. Statistical hypotheses must be mathematically pecise, and they must correspond to specific claims about the characteristics of the data generating mechanism.
+
+Let's assume that I am dealing with a hypotheses of a civil war occuring for a given condition (let2s call this option as B)
+
+1.  B=0.5 (either occur or not)
+2.  B \< 0.5 (less chances than occuring )
+3.  B\> 0.5 (more likely occuring)
+4.  B != 0.5 ( not occuring)
+
+All these are legitimate examples of statistical hypotheses because they are statements about a population parameter and are meaningfullly related to theory (experience)
+
+## Null and Alternative Hypotheses
+
+1.  Create a Null Hypotheses: Null Hypotheses express the status quo and doneted as Ho.
+2.  Create an Alternative Hypotheses: An alternative hypotheses usually tend to be a change in the status quo.
+3.  we choose an α level (e.g., α " .05,
+4.  come up with some test statistic (e.g., X) that does a good job (in some meaningful sense) of comparing H0 to H1,
+5.  figure out the sampling distribution of the test statistic on the assumption that the null hypothesis is true
+6.  calculate the critical region that produces an appropriate α level
+
+The best way to think about it, in my experience, is to imagine that a hypothesis test is a criminal trial4... the trial of the null hypothesis. The null hypothesis is the defendant, the researcher is the prosecutor, and the statistical test itself is the judge. Just like a criminal trial, there is a presumption of innocence: the null hypothesis is deemed to be true unless you, the researcher, can prove beyond a reasonable doubt that it is false. You are free to design your experiment however you like (within reason, obviously!), and your goal when doing so is to maximise the chance that the data will yield a conviction... for the crime of being false. The catch is that the statistical test sets the rules of the trial, and those rules are designed to protect the null hypothesis -- specifically to ensure that if the null hypothesis is actually true, the chances of a false conviction are guaranteed to be low.
+
+![](images/Screenshot%202022-12-19%20at%2016.07.41.png)
+
+We can either reject the NULL or fail to reject to NULL! Nothing more!"In statistics, these particular errors have specific names. If we reject the null hypothesis when it is in reality true, this is called a Type I Error. If you fail to reject the null hypothesis when it is in reality false, this is called a Type II Error."
+
+⚠️ "statistically significant" means is that the data allowed us to reject a null hypothesis. Whether or not the result is actually important in the real world is a very different question, and depends on all sorts of other things.
+
+"Within Normal distributions, there is one special case of the utmost importance: the Standard Normal distribution. The standard Normal distribution is a Normal distribution with mean μ=0 and variance σ2=1. This distribution is particularly useful because we can convert any Normal distribution to the standard Normal with relative ease. If a variable X follows Normal distributions with mean μ and variance σ2, we create a new variable Z by taking Z= (X-μ)/ σ
+
+### One sided or two sided test
+
+H0: θ= 0.5
+
+H1: θ != 0.5
+
+we notice that the alternative hypothesis covers both the possibility that θ \> .5 or θ \< .5. This makes sense if I really think that ESP could produce better-than-chance performance or worse-than-chance performance (and there are some people who think that). In statistical language, this is an example of a two-sided test. It's called this because the alternative hypothesis covers the area on both "sides" of the null hypothesis, and as a consequence the critical region of the test covers both tails of the sampling distribution (2.5% on either side if α " .05),
+
+If so, then my alternative hypothesis would only covers the possibility that θ ą .5, and as a consequence the null hypothesis now becomes θ ď .5:
+
+H0: \<= .5
+
+H1: \> 5
+
+When this happens, we have what's called a one-sided test, and when this happens the critical region only
+
+### The p value of Test
+
+In effect, p is a summary of all the possible hypothesis tests that you could have run, taken across all possible α values. And as a consequence it has the effect of "softening" our decision process. For those tests in which p ď α you would have rejected the null hypothesis, whereas for those tests in which p ą α you would have retained the null.
+
+regardless of what test you're doing, the one thing that you always have to do is say something about the p value, and whether or not the outcome was significant.
+
+![](images/Screenshot%202022-12-19%20at%2022.21.56.png)
+
+## Hypotheses testing in R
+
+"In R, the function we use to get probabilities from all normal distributions is the pnorm function. The pnorm function takes four arguments that entirely tell it what probability we are looking for, with the format of the function is as follows:pnorm(q, mean, sd, lower.tail)"
+
+"The four arguments are as follows:
+
+•  q: The quantile of interest from the Normal distribution.
+
+•  mean: The mean μ---default value of 0---of the Normal distribution in question.
+
+•  sd: The standard deviation σ---default value of 1---of the Normal distribution in question.
+
+•  lower.tail: A TRUE/FALSE value---default value of TRUE---that defines if whether we are interested in the probability that the Normal distribution is less or greater than the quantile. For P(N(0,1)\<q), we use lower.tail=TRUE. For P(N(0,1)\>q), we use lower.tail=FALSE."
+
+So, "say that we want P(N(5,4)\>6.46). To get this in R, we would use the code
+
+pnorm(q=6.46, mean=5, sd=2, lower.tail=FALSE)"
+
+```{r}
+
+# P(N(−2,16)>7) 
+# P(N(1.2,15.4)<10)
+# P(N(0,12)<6)
+# P(N(−3,1)>0)
+
+pnorm(7, -2, 4)
+pnorm(10, 1.2, sqrt(15.4))
+pnorm(6, 0, sqrt(12))
+pnorm(0, -3, 1)
+```
+
+```{r}
+binom.test(x=62, n=100, p=0.5)
+```
+
+the p-value of 0.02 is less than the usual choice of α " .05, so you can reject the null.
