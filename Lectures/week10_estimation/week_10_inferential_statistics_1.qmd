@@ -381,14 +381,11 @@ In this code, `pnorm(z)` gives the probability that a standard normal random var
 
 ### **Explanation of `pnorm(z)`**
 
--   **What is a CDF?**:
-    The cumulative distribution function (CDF) of a random variable gives the probability that the variable is less than or equal to a certain value.
+-   **What is a CDF?**: The cumulative distribution function (CDF) of a random variable gives the probability that the variable is less than or equal to a certain value.
 
--   **What does `pnorm(z)` calculate?**:
-    When you pass a z-score to **`pnorm`**, it computes the area under the normal curve to the left of that z-score. This area represents the probability that a normally distributed variable (with a mean of 0 and standard deviation of 1) would take on a value less than **`z`**.
+-   **What does `pnorm(z)` calculate?**: When you pass a z-score to **`pnorm`**, it computes the area under the normal curve to the left of that z-score. This area represents the probability that a normally distributed variable (with a mean of 0 and standard deviation of 1) would take on a value less than **`z`**.
 
--   **Interpreting `pnorm(z)` in this context**:
-    In our specific example, **`z`** represents how many standard errors the value 110 is away from the sample mean. By using **`pnorm`**, you're essentially asking, "What is the probability that the true population mean is less than 110, assuming the sample mean is an unbiased estimate of the population mean and the distribution of sample means is normal?" The very high probability (0.999874859905791, or about 99.99%) suggests that it's highly likely that the true mean is less than 110, based on our sample.
+-   **Interpreting `pnorm(z)` in this context**: In our specific example, **`z`** represents how many standard errors the value 110 is away from the sample mean. By using **`pnorm`**, you're essentially asking, "What is the probability that the true population mean is less than 110, assuming the sample mean is an unbiased estimate of the population mean and the distribution of sample means is normal?" The very high probability (0.999874859905791, or about 99.99%) suggests that it's highly likely that the true mean is less than 110, based on our sample.
 
 ### **Visual Understanding**
 
@@ -558,5 +555,3 @@ cat(sprintf("The probability that a randomly selected student's IQ is between %s
             lower_bound, upper_bound, prob_interval))
 
 ```
-
-# 

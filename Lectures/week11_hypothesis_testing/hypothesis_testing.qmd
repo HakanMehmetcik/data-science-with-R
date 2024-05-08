@@ -10,195 +10,468 @@ execute:
 df-print: kable
 ---
 
-## Test of Significance (Single Sample Inference)
+## Hypotheses Testing 
 
-Suppose that we want to hypothesize that the mean number of TV hours watched per week is 28.5; we'll define this as our null hypothesis, Ho.
+Hypothesis testing is a fundamental concept in statistics that helps in making decisions based on data from a sample. That is, it is used to assess the evidence in the data and provides a methodology for making decisions using sample data.
 
-Let's assume that we only have access to a subset of household data, from which we can estimate the population mean and standard error of the sample
+### **Key Components of Hypothesis Testing**
+
+1.  **Null Hypothesis (H0)**:
+
+    -   The null hypothesis represents a statement of "no effect" or "no difference."
+
+    -   It is the hypothesis that one seeks to challenge with sample data. For instance, if you want to test whether a new teaching method is more effective than the current one, the null hypothesis would be "the new method is no better than the current method."
+
+2.  **Alternative Hypothesis (H1 or Ha)**:
+
+    -   The alternative hypothesis is a statement that contradicts the null hypothesis. It represents the effect or difference you aim to prove.
+
+    -   Continuing with our example, the alternative hypothesis would be "the new teaching method is better than the current method."
+
+![](images/png.png)
+
+1.  **Type I and Type II Errors**:
+
+    -   **Type I Error (α)**: This error occurs when the null hypothesis is true, but we incorrectly reject it. It is also known as the "false positive" error.
+
+    -   **Type II Error (β)**: This error occurs when the null hypothesis is false, but we fail to reject it, which is a "false negative" error.
+
+![](images/clipboard-2977202868.png)
+
+1.  **Significance Level (α)**:
+
+    -   The probability of rejecting the null hypothesis when it is true (Type I error).
+
+    -   Common choices for α are 0.05 (5%), 0.01 (1%), and 0.10 (10%). Choosing a lower α reduces the chances of a Type I error.
+
+2.  **p-value**:
+
+    -   The p-value is the probability of observing a test statistic at least as extreme as the one observed, under the assumption that the null hypothesis is true.
+
+    -   If the p-value is less than the chosen significance level α, we reject the null hypothesis.
+
+::: callout-note
+### 💡  **Court Case Analogy for Hypothesis Testing**
+
+In a court case, a defendant is considered innocent until proven guilty. This setup is analogous to hypothesis testing in the following ways:
+
+**Null Hypothesis (H0)**
+
+-   **Court Case:** The defendant is innocent.
+
+**Alternative Hypothesis (H1)**
+
+-   **Court Case:** The defendant is guilty.
+
+**Types of Errors**
+
+**Type I Error (α)**
+
+-   **Court Case:** The defendant is innocent (truth), but is wrongly convicted (judgment). This is a false positive – concluding something is true when it is actually false.
+
+**Type II Error (β)**
+
+-   **Court Case:** The defendant is guilty (truth), but is wrongly acquitted (judgment). This is a false negative – failing to conclude something is true when it actually is.
+
+**Practical Implications**
+
+Using this analogy, we can see the critical balance in choosing the significance level (α) and the power of the test (1 - β, where β is the probability of making a Type II error). Lowering α reduces the risk of convicting an innocent person (making a Type I error), but may increase the chance of acquitting a guilty person (making a Type II error).
+:::
+
+## Step-by-Step Procedure of Hypothesis Testing
+
+### **Step 1: Formulate Hypotheses**
+
+First, you need to define your null hypothesis (H0) and your alternative hypothesis (H1). These hypotheses should be mutually exclusive and collectively exhaustive.
+
+-   **Null Hypothesis (H0):** Typically posits no effect or no difference between groups. For example, "there is no difference in the mean test scores between students taught under different teaching methods."
+
+-   **Alternative Hypothesis (H1 or Ha):** Posits an effect or a difference. For example, "students taught by Method B have higher average test scores than those taught by Method A."
+
+### **Step 2: Choose a Suitable Test**
+
+Select a statistical test based on the type of data and the hypothesis you are testing. The choice of test depends on several factors:
+
+-   **Type of data** (e.g., nominal, ordinal, interval, ratio)
+
+-   **Distribution of data** (e.g., normal distribution or not)
+
+-   **Sample size**
+
+-   **Dependence between samples** (independent vs paired or matched samples)
+
+Common tests include:
+
+-   **t-test** for one sample mean or comparing the means of two groups.
+
+-   **ANOVA** for comparing the means of three or more groups.
+
+-   **Chi-square test** for testing relationships between categorical variables.
+
+-   **Regression analysis** for understanding relationships between variables.
+
+### **Step 3: Compute the Test Statistic**
+
+After choosing the appropriate test:
+
+-   Collect the sample data.
+
+-   Calculate the test statistic using the formula specific to the test chosen. This involves measures like the mean, standard deviation, and others depending on the test.
+
+### **Step 4: Obtain and Interpret the p-value**
+
+-   **p-value:** Calculate or obtain the p-value, which helps you determine the significance of the results.
+
+-   The p-value represents the probability of observing your data, or something more extreme, if the null hypothesis is true.
+
+### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+-   Compare the p-value with your pre-determined significance level (α, commonly set at 0.05).
+
+-   If the p-value is **less than or equal to α**, reject the null hypothesis (evidence suggests an effect).
+
+-   If the p-value is **greater than α**, do not reject the null hypothesis (not enough evidence to suggest an effect).
+
+### **Step 6: Report the Results**
+
+-   Clearly state whether you rejected or did not reject the null hypothesis.
+
+-   Discuss the implications of your findings in the context of the study.
+
+### **Example 1: One-Sample t-Test** 
+
+**Scenario and Data**
+
+Suppose agronomists have developed a new variety of corn and claim that its average height at maturity is different from the national average height of 150 cm for standard corn varieties.
+
+**Data**
+
+We'll assume that the heights of 12 samples of this new variety of corn at maturity are as follows (in cm):
+155,153,149,156,151,154,152,150,151,153,152,150155,153,149,156,151,154,152,150,151,153,152,150
+
+#### **Step 1: Formulate Hypotheses**
+
+-   **Null Hypothesis (H0):** The mean height of the new corn variety is 150 cm.
+
+-   **Alternative Hypothesis (H1):** The mean height of the new corn variety is not 150 cm.
+
+#### **Step 2: Choose a Suitable Test**
+
+-   **Test Chosen:** One-sample t-test, as we are comparing the sample mean to a known population mean.
+
+-   **Type of Data:** Continuous (heights of corn)
+
+-   **Sample Size:** 12 corn plants
+
+#### **Step 3: Compute the Test Statistic**
+
+-   Use the following R code to calculate the t-test:
 
 ```{r}
-x <- c(25.7, 38.5, 29.3, 25.1, 30.6, 34.6, 30.0, 39.0, 33.7, 31.6, 
-       25.9, 34.4, 26.9, 23.0, 31.1, 29.3, 34.5, 35.1, 31.2, 33.2, 
-       30.2, 36.4, 37.5, 27.6, 24.6, 23.9, 27.0, 29.5, 30.1, 29.6, 
-       27.3, 31.2, 32.5, 25.7, 30.1, 24.2, 24.1, 26.4, 31.0, 20.7, 
-       33.5, 32.2, 34.7, 32.6, 33.5, 32.7, 25.6, 31.1, 32.9, 25.9)
+# Define the sample data
+corn_heights <- c(155, 153, 149, 156, 151, 154, 152, 150, 151, 153, 152, 150)
 
-mean.x <- mean(x)
-SE.x <- sd(x)/ sqrt(length(x))
+# Perform a one-sample t-test
+t_test_result <- t.test(corn_heights, mu = 150)
+
 ```
 
-The arithmetic mean of x is 30.14 which is slightly different from our hypothesized value of 28.5. This begs question: is this difference significant, or is it due to chance variation alone?
-
-What would you say?
-
-### The null and alternative hypothesis
-
-The objective of hypothesis testing is to assess whether the observed data are consistent with a well specified (hypothesized) random process, Ho.
-
-> Ho: = 28.5 Ha: ≠ 28.5
-
-Ho is a statement about the true nature of things. To assess whether our observed data are consistent with our null hypothesis we seek to compare our data with the hypothesized value.
-
-In essence, we compare our observed data (usually as a statistical summary) to the hypothesized distribution using a *test statistic* from which a *test of significance* is calculated (this tells us how likely our observed statistic agrees with our hypothesized process). These, and derived concepts, are highlighted in the subsequent sections.
-
-### Test Statistics
-
-A **test statistic** is a numerical summary of the data that is compared to what would be expected under the null hypothesis. Test statistics can take on many forms such as the **z-tests** (usually used for large datasets) or t-tests (usually used when datasets are small)
-
-#### Z-tests
-
-The **z-statistic** is a measure of how much an observed statistic differs from an expected statistic put forward by the null hypothesis. It is computed as
-
-z= (observed-expected) / SE
-
-In computing the z-statistic, the SE used is not standard error of the observed data, but the standard error for the null. To be more precise, the SE in this formula is computed from the null's SD, if given. However, in many cases, the null's SD can only be estimated from the observed data's SD.
-
-In R, pnorm() function computes the z-statistic.
+#### **Step 4: Obtain and Interpret the p-value**
 
 ```{r}
-Ho <- 28.5
-z <- (mean.x-Ho) / SE.x
-P.Ho <- pnorm(z, lower.tail = FALSE)
-P.Ho
+# Print the test result
+print(t_test_result)
 ```
 
-Here, z is on the right side of the curve and the probability of getting a test statistic more extreme than our z is about **0.003** or 0.31% . P is called the **observed significance level** and is sometimes referred to as the P-value. The *smaller* this probability, the *stronger* the evidence against Ho meaning that the odds of the mean TV hours watched per household being 28.5 is very small. Careful, P **is not** the chance of Ho being right, such statement is prevalent but is *wrong*.
+**Test Output Interpretation**:
 
-Sometimes researchers will define a P value for which Ho will be rejected. Such value is usually referred to as the αvalueαvalue. If such a test is requested, we must determine if the test is **one-tailed** or **two-tailed**. A test is *one-tailed* if the alternate hypothesis, Ha, is of the form "greater than" or "less than" (e.g. the mean number of TV hours watched *are greater than* 28.5). A test is *two-tailed* if Ha is *not* of the form "greater than" or "less than"
+-   **t-value**: 3.5322 indicates the calculated t-statistic, which measures the number of standard deviations the sample mean deviates from the hypothesized mean (150 cm). A positive value indicates the sample mean is above the hypothesized mean.
 
-Here are a few examples:
+-   **p-value**: 0.004697, which quantifies the probability of observing a test statistic at least as extreme as the one observed, under the assumption that the null hypothesis (H0: the true mean is 150) is true.
 
--   If we chose an α value of 0.05 and we wanted to test the hypothesis that our observed mean hours is **different** than Ho we would define a **two-tailed** test, meaning that we would have to define rejection regions associated with P values of *less than* 0.025 and *greater than* 0.975 (or z values of -1.96 and 1.96 respectively). The reason we choose p values of 0.025/0.975 and not 0.05/0.95 is because we need to split the 0.05 α value across *both* tails of the curve (remember that we are rejecting the null if our z value falls in *either* tails of the curve).
+**Interpretation**:
+Given that the p-value (0.004697) is significantly less than the common alpha level of 0.05, there is strong statistical evidence to reject the null hypothesis. This indicates that the mean height of the new corn variety is statistically different from 150 cm.
 
-![](images/image-369121377.png)
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
 
--   If we chose an α value of 0.05 and we wanted to test the hypothesis that our observed mean hours is **greater** than Ho, we would define a **one-tailed** test, meaning that we would have to define a rejection region associated with a Pvalue *greater than* 0.95.
+-   Since the **p-value (0.004697) \< α (0.05)**, reject the null hypothesis.
 
-![](images/image-1999344459.png)
+-   The evidence suggests that the average height of the new corn variety is significantly different from 150 cm.
 
-## t-tests
+#### **Step 6: Report the Results**
 
-When working with small sample sizes (typically less than 30), the z-test has to be modified. For starters, the shape of the sampling distribution (i.e. the distribution of means one would compute from many different samples from the same underlying population) now depends on the shape of the underlying population distribution which must therefore be approximately normal in shape. These requirements can be quite restrictive because in most cases we do not know the population's distribution.
+-   **Practical Implications**: The increased height might suggest better growth characteristics under certain conditions, which could be beneficial for yield.
 
-Continuing with our working example, let's assume that instead of a sample size of 50 we now have a sample size of 10.
+### **Example 2: One-Sample t-Test Using the `PlantGrowth` Dataset**
+
+The **`PlantGrowth`** dataset in R consists of weights of plants grown under control and two different treatment conditions. For simplicity, let’s focus on testing whether the mean weight of plants under one treatment condition differs from a known or hypothesized population mean.
+
+#### **Step 1: Formulate Hypotheses**
+
+**Scenario**: Assume the historical data suggests that the mean weight of plants under similar growth conditions is 5 grams. We'll test if the treatment 'trt1' (treatment 1) in the dataset differs from this historical mean.
+
+-   **Null Hypothesis (H0):** The mean weight of plants treated with 'trt1' is 5 grams.
+
+-   **Alternative Hypothesis (H1):** The mean weight of plants treated with 'trt1' is not equal to 5 grams.
+
+#### **Step 2: Choose a Suitable Test**
+
+Given the data type (continuous) and the objective (comparing a sample mean to a known value), a one-sample t-test is suitable.
+
+-   **Test Type**: One-sample t-test
+
+-   **Data Type**: Continuous (weight of plants)
+
+-   **Distribution**: Assume normality for the t-test application; this should ideally be checked with a normality test such as Shapiro-Wilk if the sample size is small.
+
+#### **Step 3: Compute the Test Statistic**
+
+First, extract the data for 'trt1' from the dataset, then perform the t-test.
 
 ```{r}
-x2 <- c(37.13, 32.02, 26.05, 31.76, 31.90, 38.62, 21.63, 40.75, 31.36, 27.01)
-mean.x2 <- mean(x2)
-SD.x2 <- sd(x2)
-SE.x2 <- sd(x2)/sqrt(x2)
-t.val <- (mean.x2-Ho) / SE.x2
+# Load the data
+data("PlantGrowth")
+# Filter for 'trt1'
+trt1_data <- PlantGrowth$weight[PlantGrowth$group == 'trt1']
+
+# Perform the one-sample t-test against the hypothesized mean of 5
+t_test_result <- t.test(trt1_data, mu = 5)
+
 ```
 
-The next step is to compute the P-value. We will compute P using both the normal distribution curve (which we normally do for a large sample) and *Student's* curve (which is recommended for a small sample).
+#### **Step 4: Obtain and Interpret the p-value**
+
+The output of the t-test will provide the necessary statistics including the p-value.
 
 ```{r}
-P.Ho.norm <- pnorm(t.val, lower.tail = FALSE)
-P.Ho.stud <- pt(t.val, df=length(x2)-1, lower.tail = FALSE)
-P.Ho.norm
-P.Ho.stud
+# Print the results
+print(t_test_result)
 ```
 
-## The Idea of testing Hypotheses
+**Test Output Interpretation**:
 
-One of the most common form of inferential statistics is hypotheses testing. Simple enough, hypotheses testing is a class of procedures that use sample data to examine a claim about the population parameters.
+-   **t-value**: -1.3507, which indicates the direction and magnitude of the difference between the sample mean and the hypothesized mean. A negative value suggests the sample mean is less than the hypothesized mean of 5 grams.
 
-In this way, hypothesis testing is something akin to a court case. In court cases, a defendant is put on trial, and this defendant is assumed innocent until their guilt is proven. The burden of proof is on the prosecution, who must prove that the defendant is guilty beyond the shadow of a reasonable doubt. In hypothesis testing, we place some claim on trial and assume that the claim is true until proven otherwise.
+-   **Degrees of Freedom (df)**: 9, calculated as the number of observations minus one (n-1).
 
-## Research hypotheses vs statistical hypotheses
+-   **p-value**: 0.2098, which quantifies the probability of observing a test statistic at least as extreme as the one observed, under the assumption that the null hypothesis (H0: the true mean is 5) is true.
 
-1.  listening to music reduces your ability to pay attention to other things. (A causal relationship between listening to music and attention to things)
-2.  Intelligence is related to personality. (May be correlational but not causal)
-3.  Intelligence şs speed of information processing ( not correlational, not causal, just to define what a particular thing is.) (not what does X effect on Y but what is X? )
-4.  Love is a battlefield? (nothing testable)
+-   **95% Confidence Interval**: \[4.093239, 5.228761\], indicates the range of values within which we can be 95% confident that the true population mean lies. This interval includes the hypothesized mean (5 grams), suggesting that this mean is a plausible value for the population mean given the sample data.
 
-All these, can be (some of the certainly vaugue) research hypotheses or scientific claims. Yet, none of them actually a statistical hypotheses. Statistical hypotheses must be mathematically pecise, and they must correspond to specific claims about the characteristics of the data generating mechanism.
+-   **Sample Estimates (Mean of x)**: 4.661, which is the observed sample mean of the treatment group **`trt1`**.
 
-Let's assume that I am dealing with a hypotheses of a civil war occuring for a given condition (let2s call this option as B)
+**Interpretation**:
+Given that the p-value (0.2098) is greater than the common alpha level of 0.05, there is insufficient evidence to reject the null hypothesis. The data does not provide strong evidence to suggest that the treatment significantly deviates from the hypothesized mean of 5 grams.
 
-1.  B=0.5 (either occur or not)
-2.  B \< 0.5 (less chances than occuring )
-3.  B\> 0.5 (more likely occuring)
-4.  B != 0.5 ( not occuring)
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
 
-All these are legitimate examples of statistical hypotheses because they are statements about a population parameter and are meaningfullly related to theory (experience)
+-   **Alpha (α)**: Set at 0.05.
 
-## Null and Alternative Hypotheses
+-   **Decision**:
 
-1.  Create a Null Hypotheses: Null Hypotheses express the status quo and doneted as Ho.
-2.  Create an Alternative Hypotheses: An alternative hypotheses usually tend to be a change in the status quo.
-3.  we choose an α level (e.g., α " .05,
-4.  come up with some test statistic (e.g., X) that does a good job (in some meaningful sense) of comparing H0 to H1,
-5.  figure out the sampling distribution of the test statistic on the assumption that the null hypothesis is true
-6.  calculate the critical region that produces an appropriate α level
+    -   Since the **p-value (0.2098) \> α (0.05)**, fail to reject the null hypothesis.
 
-The best way to think about it, in my experience, is to imagine that a hypothesis test is a criminal trial4... the trial of the null hypothesis. The null hypothesis is the defendant, the researcher is the prosecutor, and the statistical test itself is the judge. Just like a criminal trial, there is a presumption of innocence: the null hypothesis is deemed to be true unless you, the researcher, can prove beyond a reasonable doubt that it is false. You are free to design your experiment however you like (within reason, obviously!), and your goal when doing so is to maximise the chance that the data will yield a conviction... for the crime of being false. The catch is that the statistical test sets the rules of the trial, and those rules are designed to protect the null hypothesis -- specifically to ensure that if the null hypothesis is actually true, the chances of a false conviction are guaranteed to be low.
+    -   This decision indicates that there is not enough statistical evidence to conclude that the mean weight of plants treated with **`trt1`** is different from 5 grams.
 
-![](images/Screenshot%202022-12-19%20at%2016.07.41.png)
+#### **Step 6: Report the Results**
 
-We can either reject the NULL or fail to reject to NULL! Nothing more!"In statistics, these particular errors have specific names. If we reject the null hypothesis when it is in reality true, this is called a Type I Error. If you fail to reject the null hypothesis when it is in reality false, this is called a Type II Error."
+-   **Reporting**:
 
-⚠️ "statistically significant" means is that the data allowed us to reject a null hypothesis. Whether or not the result is actually important in the real world is a very different question, and depends on all sorts of other things.
+    -   State that the one-sample t-test performed on the plant weights from treatment group **`trt1`** resulted in a t-value of -1.3507 with a p-value of 0.2098, which was not sufficient to reject the null hypothesis at the 5% significance level.
 
-"Within Normal distributions, there is one special case of the utmost importance: the Standard Normal distribution. The standard Normal distribution is a Normal distribution with mean μ=0 and variance σ2=1. This distribution is particularly useful because we can convert any Normal distribution to the standard Normal with relative ease. If a variable X follows Normal distributions with mean μ and variance σ2, we create a new variable Z by taking Z= (X-μ)/ σ
+    -   Mention that the 95% confidence interval for the mean weight of the plants ranges from approximately 4.09 to 5.23 grams, which includes the hypothesized mean of 5 grams.
 
-### One sided or two sided test
+-   **Implications**:
 
-H0: θ= 0.5
+    -   Discuss the implications of these results in terms of treatment effectiveness. The results suggest that the treatment does not significantly alter the plant growth from the expected 5 grams, implying that the treatment may not be effective in significantly enhancing growth beyond the hypothesized mean.
 
-H1: θ != 0.5
+### **Example 2: Two-Sample t-Test Using the `sleep` Dataset**
 
-we notice that the alternative hypothesis covers both the possibility that θ \> .5 or θ \< .5. This makes sense if I really think that ESP could produce better-than-chance performance or worse-than-chance performance (and there are some people who think that). In statistical language, this is an example of a two-sided test. It's called this because the alternative hypothesis covers the area on both "sides" of the null hypothesis, and as a consequence the critical region of the test covers both tails of the sampling distribution (2.5% on either side if α " .05),
+#### **Step 1: Formulate Hypotheses**
 
-If so, then my alternative hypothesis would only covers the possibility that θ ą .5, and as a consequence the null hypothesis now becomes θ ď .5:
+-   **Null Hypothesis (H0)**: There is no difference in the mean extra sleep between the two drug groups.
 
-H0: \<= .5
+-   **Alternative Hypothesis (H1)**: There is a difference in the mean extra sleep between the two drug groups.
 
-H1: \> 5
+#### **Step 2: Choose a Suitable Test**
 
-When this happens, we have what's called a one-sided test, and when this happens the critical region only
+-   A **two-sample t-test** is appropriate as we are comparing the means of two independent groups under the assumption that the populations have unequal variances (hence, Welch’s t-test).
 
-### The p value of Test
-
-In effect, p is a summary of all the possible hypothesis tests that you could have run, taken across all possible α values. And as a consequence it has the effect of "softening" our decision process. For those tests in which p ď α you would have rejected the null hypothesis, whereas for those tests in which p ą α you would have retained the null.
-
-regardless of what test you're doing, the one thing that you always have to do is say something about the p value, and whether or not the outcome was significant.
-
-![](images/Screenshot%202022-12-19%20at%2022.21.56.png)
-
-## Hypotheses testing in R
-
-"In R, the function we use to get probabilities from all normal distributions is the pnorm function. The pnorm function takes four arguments that entirely tell it what probability we are looking for, with the format of the function is as follows:pnorm(q, mean, sd, lower.tail)"
-
-"The four arguments are as follows:
-
-•  q: The quantile of interest from the Normal distribution.
-
-•  mean: The mean μ---default value of 0---of the Normal distribution in question.
-
-•  sd: The standard deviation σ---default value of 1---of the Normal distribution in question.
-
-•  lower.tail: A TRUE/FALSE value---default value of TRUE---that defines if whether we are interested in the probability that the Normal distribution is less or greater than the quantile. For P(N(0,1)\<q), we use lower.tail=TRUE. For P(N(0,1)\>q), we use lower.tail=FALSE."
-
-So, "say that we want P(N(5,4)\>6.46). To get this in R, we would use the code
-
-pnorm(q=6.46, mean=5, sd=2, lower.tail=FALSE)"
+#### **Step 3: Compute the Test Statistic**
 
 ```{r}
-
-# P(N(−2,16)>7) 
-# P(N(1.2,15.4)<10)
-# P(N(0,12)<6)
-# P(N(−3,1)>0)
-
-pnorm(7, -2, 4)
-pnorm(10, 1.2, sqrt(15.4))
-pnorm(6, 0, sqrt(12))
-pnorm(0, -3, 1)
+data("sleep")
+t_test_result <- t.test(extra ~ group, data = sleep)
+t_test_result
 ```
+
+#### **Step 4: Obtain and Interpret the p-value**
+
+-   The p-value from the t-test output will indicate whether the differences in means are statistically significant. The p-value is 0.07939. This value tells us the probability of observing as extreme or more extreme differences between the two groups under the null hypothesis that there is no difference between them.
+
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+-   If **p-value ≤ 0.05**, reject H0; otherwise, fail to reject H0. The p-value of 0.07939 is greater than the typical alpha level of 0.05. This means we do not have enough evidence to reject the null hypothesis at the 5% significance level. In other words, we fail to reject the null hypothesis and conclude that there is no statistically significant difference in the mean extra sleep between the two drug groups, given the data.
+
+#### **Step 6: Report the Results**
+
+-   Present the t-test results, discuss the implications if the null hypothesis is rejected or not, and consider any potential limitations of the study. Although there appears to be a difference in the mean extra sleep favoring group 2, this difference isn't statistically significant at the conventional threshold. Clinically or practically, it suggests that further investigation with perhaps a larger sample size might be needed to conclusively determine if there indeed is a difference caused by the drugs, or if the observed difference was just by chance.
+
+### **Example 3: ANOVA Test by Using ToothGrowth Dataset** 
+
+ANOVA (Analysis of Variance) is a statistical method used to test differences between three or more group means to see if at least one group mean is statistically different from the others. For this example, let’s use the built-in **`ToothGrowth`** dataset in R, which measures the effect of vitamin C on tooth growth in guinea pigs. The dataset includes two key variables: **`len`** (length of tooth growth) and **`supp`** (type of supplement, either VC for Vitamin C or OJ for orange juice), and **`dose`** (dose level of the supplement).
+
+We will perform a one-way ANOVA to compare the tooth growth (**`len`**) across different dose levels of supplements.
+
+#### **Step 1: Formulate Hypotheses**
+
+-   **Null Hypothesis (H0):** There is no difference in the mean tooth growth (**`len`**) across the different doses of vitamin C supplements.
+
+-   **Alternative Hypothesis (H1):** At least one dose level has a different mean tooth growth compared to the others.
+
+#### **Step 2: Choose a Suitable Test**
+
+Given that the data involves comparing the means of tooth growth across more than two groups (different doses), and assuming the data meets necessary assumptions (normality, independence, and homogeneity of variances). Thus, ANOVA (Analysis of Variance) is appropriate as it allows comparing the means across three or more groups to determine if there is any statistically significant difference.
+
+### **Step 3: Compute the Test Statistic**
+
+-   Load and check the dataset, and then compute the ANOVA:
 
 ```{r}
-binom.test(x=62, n=100, p=0.5)
+# Load the data
+data("ToothGrowth")
+
+# If 'dose' is not a factor, convert it to a factor
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+
+# Check basic data structure
+str(ToothGrowth)
+summary(ToothGrowth)
+
+# Perform ANOVA
+anova_result <- aov(len ~ dose, data = ToothGrowth)
+summary(anova_result)
 ```
 
-the p-value of 0.02 is less than the usual choice of α " .05, so you can reject the null.
+### **Step 4: Obtain and Interpret the p-value**
+
+The output from the ANOVA (**`aov`**) function provides key statistics about the effects of **`dose`** on **`len`** (tooth length). Here's how to interpret the critical elements:
+
+-   **F value:** 67.42, a measure of the variance ratio between the mean squares of the treatment and the residuals. This high value suggests a strong model fit.
+
+-   **p-value:** 9.53e-16, extremely small, providing compelling evidence to reject the null hypothesis.**Interpretation**: Given the very low p-value, there is strong statistical evidence to reject the null hypothesis. This result suggests that different dose levels have significantly different effects on tooth growth.
+
+**Interpretation:** The extremely low p-value suggests that the differences in tooth growth across the three dose levels are statistically significant. The mean tooth growth is not the same for all dosage levels, with each increment likely having a different impact on growth outcomes.
+
+### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+-   **Alpha (α) Level:** Typically set at 0.05.
+
+-   **Decision:** Since the p-value (9.53e-16) is far less than 0.05, we reject the null hypothesis.
+
+-   **Conclusion:** There is statistically significant evidence that different doses of vitamin C have different effects on tooth growth in guinea pigs.
+
+### **Step 6: Report the Results**
+
+-   **Summarize the Analysis:** Clearly state that the ANOVA revealed significant differences in tooth growth across the different doses of Vitamin C administered to guinea pigs.
+
+-   **Detailed Findings:** Highlight that as the dose increases, the mean tooth length significantly changes, suggesting a dose-response relationship.
+
+-   **Post-hoc Analysis:** Given the significant ANOVA result, perform a post-hoc analysis to identify which specific doses differ significantly. This can be done using Tukey's Honestly Significant Difference (HSD) test.
+
+```{r}
+# Assuming anova_result is the result from aov call
+post_hoc <- TukeyHSD(anova_result)
+print(post_hoc)
+```
+
+-   **Graphical Representation**: It might also be beneficial to include graphical summaries (e.g., box plots) to visually represent the differences between groups.
+
+```{r}
+boxplot(len ~ dose, data = ToothGrowth,
+        main = "Tooth Growth by Vitamin C Dose Levels",
+        xlab = "Dose of Vitamin C (mg)",
+        ylab = "Tooth Length",
+        col = c("lightblue", "lightgreen", "pink"))
+```
+
+### **Example 4: Chi-Square Test of Independence Using `UCBAdmissions` Dataset**
+
+#### **Step 1: Formulate Hypotheses**
+
+-   **Null Hypothesis (H0)**: Gender and admission status are independent.
+
+-   **Alternative Hypothesis (H1)**: Gender and admission status are not independent.
+
+#### **Step 2: Choose a Suitable Test**
+
+-   The **Chi-square test of independence** is suitable for testing relationships between two categorical variables.
+
+#### **Step 3: Compute the Test Statistic**
+
+```{r}
+data("UCBAdmissions")
+# Sum across departments to get a two-way table of Gender by Admit status
+admission_table <- apply(UCBAdmissions, c(1, 2), sum)
+print(admission_table)
+
+chi_sq_result <- chisq.test(admission_table)
+print(chi_sq_result)
+
+
+```
+
+#### **Step 4: Obtain and Interpret the p-value**
+
+-   Interpret the chi-square test’s p-value to determine if the observed distribution of counts is significantly different from the expected distribution if H0 were true.
+
+-   The p-value is reported as being less than 2.2e-16, which is effectively 0 for practical purposes. This extremely small p-value suggests that the probability of observing such an extreme chi-squared value under the null hypothesis is virtually zero.
+
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+-   If **p-value ≤ 0.05**, reject H0; otherwise, fail to reject H0.
+
+-   The results imply that gender has a substantial impact on admission decisions at UC Berkeley, according to the data analyzed. This finding could suggest bias or an underlying factor that correlates with both gender and admission likelihood, which might warrant further investigation to understand the causes and address potential equity issues.
+
+#### **Step 6: Report the Results**
+
+-   Explain what the findings mean in the context of gender bias in admissions, detailing the statistical significance and potential social implications. From a practical viewpoint, this test's result implies that gender does not influence admission decisions across different departments at the University of California, Berkeley, based on the data in the **`UCBAdmissions`** dataset.
+
+-   This result is crucial for policy makers, educational administrators, and the broader academic community, highlighting the need for continuous monitoring and possibly recalibrating admission processes to ensure fairness and equity.
+
+### **Example 5: Simple Linear Regression Using the `mtcars` Dataset**
+
+#### **Step 1: Formulate Hypotheses**
+
+-   **Null Hypothesis (H0)**: There is no relationship between the weight of cars (wt) and fuel efficiency (mpg).
+
+-   **Alternative Hypothesis (H1)**: Heavier cars (greater wt) have lower fuel efficiency (mpg).
+
+#### **Step 2: Choose a Suitable Test**
+
+-   **Simple linear regression** is appropriate for modeling the relationship between two continuous variables and assessing the strength and direction of the relationship.
+
+#### **Step 3: Compute the Test Statistic**
+
+```{r}
+data("mtcars")
+model <- lm(mpg ~ wt, data = mtcars)
+summary(model)
+
+```
+
+#### **Step 4: Obtain and Interpret the p-value**
+
+-   The summary of the regression model will provide p-values for the slope coefficients, which indicate whether the relationship between weight and mpg is statistically significant.
+
+-   Extremely small, providing strong evidence against the null hypothesis and indicating a statistically significant negative effect of weight on mpg.
+
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+-   If **p-value ≤ 0.05** for the weight coefficient, reject H0; otherwise, fail to reject H0. We reject the Null that there is no relationship between the weight of cars (wt) and fuel efficiency (mpg).
+
+#### **Step 6: Report the Results**
+
+-   Discuss the relationship between car weight and fuel efficiency, the strength of the relationship (R-squared), and any implications or recommendations for car design or consumer choice.
+
+-   There is a need for lighter cars for better fuel efficiency.
