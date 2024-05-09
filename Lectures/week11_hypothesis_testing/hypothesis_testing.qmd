@@ -18,17 +18,17 @@ Hypothesis testing is a fundamental concept in statistics that helps in making d
 
 1.  **Null Hypothesis (H0)**:
 
-    -   The null hypothesis represents a statement of "no effect" or "no difference."
+    -   The null hypothesis represents a statement of **"no effect" or "no difference."**
 
     -   It is the hypothesis that one seeks to challenge with sample data. For instance, if you want to test whether a new teaching method is more effective than the current one, the null hypothesis would be "the new method is no better than the current method."
 
 2.  **Alternative Hypothesis (H1 or Ha)**:
 
-    -   The alternative hypothesis is a statement that contradicts the null hypothesis. It represents the effect or difference you aim to prove.
+    -   The alternative hypothesis is a statement that contradicts the null hypothesis. It represents **the effect or difference you aim to prove.**
 
     -   Continuing with our example, the alternative hypothesis would be "the new teaching method is better than the current method."
 
-![](images/png.png)
+![](images/png.png){fig-align="center"}
 
 1.  **Type I and Type II Errors**:
 
@@ -138,16 +138,35 @@ After choosing the appropriate test:
 
 -   Discuss the implications of your findings in the context of the study.
 
+::: callout-note
+👋 The following is the most used method of hypothesis testing in R, the t-test!
+
+```         
+#one sample t-test
+t.test(x, y = NULL,
+       alternative = c("two.sided", "less", "greater"),
+       mu = 0, paired = FALSE, var.equal = FALSE,
+       conf.level = 0.95, …)
+```
+
+where:
+
+-   x, y: The two samples of data.
+
+-   alternative: The alternative hypothesis of the test.
+
+-   mu: The true value of the mean.
+
+-   paired: Whether to perform a paired t-test or not.
+
+-   var.equal: Whether to assume the variances are equal between the samples.
+
+-   conf.level: The confidence level to use.
+:::
+
 ### **Example 1: One-Sample t-Test** 
 
-**Scenario and Data**
-
-Suppose agronomists have developed a new variety of corn and claim that its average height at maturity is different from the national average height of 150 cm for standard corn varieties.
-
-**Data**
-
-We'll assume that the heights of 12 samples of this new variety of corn at maturity are as follows (in cm):
-155,153,149,156,151,154,152,150,151,153,152,150155,153,149,156,151,154,152,150,151,153,152,150
+A one sample t-test is used to test whether or not the mean of a population is equal to a known value. For example, suppose agronomists have developed a new variety of corn and claim that its average height at maturity is different from the national average height of 150 cm for standard corn varieties.
 
 #### **Step 1: Formulate Hypotheses**
 
@@ -185,11 +204,6 @@ print(t_test_result)
 
 **Test Output Interpretation**:
 
--   **t-value**: 3.5322 indicates the calculated t-statistic, which measures the number of standard deviations the sample mean deviates from the hypothesized mean (150 cm). A positive value indicates the sample mean is above the hypothesized mean.
-
--   **p-value**: 0.004697, which quantifies the probability of observing a test statistic at least as extreme as the one observed, under the assumption that the null hypothesis (H0: the true mean is 150) is true.
-
-**Interpretation**:
 Given that the p-value (0.004697) is significantly less than the common alpha level of 0.05, there is strong statistical evidence to reject the null hypothesis. This indicates that the mean height of the new corn variety is statistically different from 150 cm.
 
 #### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
@@ -200,7 +214,75 @@ Given that the p-value (0.004697) is significantly less than the common alpha le
 
 #### **Step 6: Report the Results**
 
--   **Practical Implications**: The increased height might suggest better growth characteristics under certain conditions, which could be beneficial for yield.
+-   **Test Overview**: Conducted a one-sample t-test to determine if the mean height of corn differs significantly from a hypothesized mean of 150 inches.
+
+-   **Test Statistic**: The t-statistic is 3.5322. This value indicates the number of standard deviations that the sample mean (152.1667 inches) deviates from the hypothesized mean.
+
+-   **Degrees of Freedom**: The degrees of freedom for the test are 11, which is calculated based on the sample size minus one (n - 1).
+
+-   **P-Value**: The p-value of the test is 0.004697. A p-value less than 0.05 typically indicates strong evidence against the null hypothesis at the 5% significance level. In this context, it suggests that the difference in mean height from the hypothesized 150 inches is statistically significant.
+
+-   **Confidence Interval**: The 95% confidence interval for the mean height of the corn is from 150.8166 to 153.5168 inches. This interval does not include the hypothesized mean of 150 inches, further supporting the rejection of the null hypothesis.
+
+-   **Mean Estimate**: The estimated mean height of the corn from the sample is 152.1667 inches, which is higher than the hypothesized mean of 150 inches.
+
+-   **Conclusion**: The results of the t-test provide significant statistical evidence to reject the null hypothesis that the mean height of the corn is 150 inches. Instead, the data supports the alternative hypothesis that the true mean height is different from 150 inches, specifically indicating an average height greater than 150 inches. The findings suggest that the corn heights are statistically significantly higher than the hypothesized mean, with a mean height estimated at 152.1667 inches.
+
+-   **Practical Implications**: These findings could have implications for agricultural practices, such as evaluating the effectiveness of growth conditions or agricultural treatments aimed at increasing corn height.
+
+-   **A graphical representation:** To create a graph in R that shows the distribution of your corn_heights data along with the hypothesized mean (150 in this case), you can use a combination of a histogram and a vertical line indicating the mean used in your one-sample t-test.
+
+    ```{r}
+    # Load necessary library
+    library(ggplot2)
+
+    # Define the sample data
+    corn_heights <- c(155, 153, 149, 156, 151, 154, 152, 150, 151, 153, 152, 150)
+
+    # Create a histogram with a line showing the hypothesized mean
+    ggplot(data = data.frame(corn_heights), aes(x = corn_heights)) +
+      geom_histogram(bins = 6, fill = "skyblue", color = "black", alpha = 0.7) + # Histogram
+      geom_vline(aes(xintercept = 150), color = "red", linetype = "dashed", size = 1.5) + # Hypothesized mean
+      labs(title = "Distribution of Corn Heights with Hypothesized Mean",
+           x = "Corn Height (inches)",
+           y = "Frequency") +
+      theme_minimal() # Clean theme
+
+    # Perform a one-sample t-test
+    t_test_result <- t.test(corn_heights, mu = 150)
+    print(t_test_result)
+
+    ```
+
+::: callout-note
+👋 You can, of course, put your hypothesis in different way to look at whether is greater or less than the known average. To adjust your one-sample t-test in R for testing whether the mean corn height is greater than or less than the known average, you need to set the **`alternative`** argument in the **`t.test`** function. This argument specifies the alternative hypothesis and can take one of three values: **`"two.sided"`**, **`"greater"`**, or **`"less"`**.
+
+-   If you want to test if the average height is greater than 150 cm, you should set **`alternative = "greater"`**.
+
+-   If you want to test if the average height is less than 150 cm, you should set **`alternative = "less"`**.
+
+Here's how you can modify your R code for these hypotheses:
+
+```{r}
+# For greater than 150 cm:
+t_test_greater <- t.test(corn_heights, mu = 150, alternative = "greater")
+print(t_test_greater)
+
+
+```
+
+**Interpretation:** Given the p-value of 0.002348, which is less than the typical alpha level of 0.05, you would reject the null hypothesis that the mean height of corn is 150 cm or less. This suggests that there is statistically significant evidence to support the claim that the mean height of the corn is greater than 150 cm. The confidence interval starting at 151.0651 further supports this conclusion as it shows the range in which the true mean is likely to lie, confidently excluding 150 cm from this range.
+
+```{r}
+# For less than 150 cm:
+t_test_less <- t.test(corn_heights, mu = 150, alternative = "less")
+print(t_test_less)
+```
+
+**Interpretation:** Given the p-value of 0.9977, you fail to reject the null hypothesis at any reasonable significance level. This result provides strong evidence that the mean height of the corn is not less than 150 cm. In fact, the sample data suggest that it is likely greater than 150 cm, aligning with the conclusions drawn from the first test where the alternative hypothesis was that the mean was greater than 150 cm. Thus, there is not just a lack of evidence for the mean being less than 150 cm; the evidence actively suggests it is higher.
+
+As you can see, each of these tests will provide you with a t-statistic and a p-value appropriate for the hypothesis you are testing. If the p-value is small (commonly if p-value \< 0.05), you can reject the null hypothesis in favor of the alternative hypothesis.
+:::
 
 ### **Example 2: One-Sample t-Test Using the `PlantGrowth` Dataset**
 
@@ -248,44 +330,251 @@ The output of the t-test will provide the necessary statistics including the p-v
 print(t_test_result)
 ```
 
-**Test Output Interpretation**:
-
--   **t-value**: -1.3507, which indicates the direction and magnitude of the difference between the sample mean and the hypothesized mean. A negative value suggests the sample mean is less than the hypothesized mean of 5 grams.
-
--   **Degrees of Freedom (df)**: 9, calculated as the number of observations minus one (n-1).
-
--   **p-value**: 0.2098, which quantifies the probability of observing a test statistic at least as extreme as the one observed, under the assumption that the null hypothesis (H0: the true mean is 5) is true.
-
--   **95% Confidence Interval**: \[4.093239, 5.228761\], indicates the range of values within which we can be 95% confident that the true population mean lies. This interval includes the hypothesized mean (5 grams), suggesting that this mean is a plausible value for the population mean given the sample data.
-
--   **Sample Estimates (Mean of x)**: 4.661, which is the observed sample mean of the treatment group **`trt1`**.
-
-**Interpretation**:
-Given that the p-value (0.2098) is greater than the common alpha level of 0.05, there is insufficient evidence to reject the null hypothesis. The data does not provide strong evidence to suggest that the treatment significantly deviates from the hypothesized mean of 5 grams.
+**Test Output Interpretation**: Given that the p-value (0.2098) is greater than the common alpha level of 0.05, there is insufficient evidence to reject the null hypothesis. The data does not provide strong evidence to suggest that the treatment significantly deviates from the hypothesized mean of 5 grams.
 
 #### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
 
--   **Alpha (α)**: Set at 0.05.
+-   Since the **p-value (0.2098) \> α (0.05)**, fail to reject the null hypothesis.
 
--   **Decision**:
-
-    -   Since the **p-value (0.2098) \> α (0.05)**, fail to reject the null hypothesis.
-
-    -   This decision indicates that there is not enough statistical evidence to conclude that the mean weight of plants treated with **`trt1`** is different from 5 grams.
+-   This decision indicates that there is not enough statistical evidence to conclude that the mean weight of plants treated with **`trt1`** is different from 5 grams.
 
 #### **Step 6: Report the Results**
 
--   **Reporting**:
+-   **Test Overview**: Performed a one-sample t-test to evaluate if the true mean of the dataset **`trt1_data`** significantly differs from the hypothesized mean of 5.
 
-    -   State that the one-sample t-test performed on the plant weights from treatment group **`trt1`** resulted in a t-value of -1.3507 with a p-value of 0.2098, which was not sufficient to reject the null hypothesis at the 5% significance level.
+-   **Test Statistic**: The computed t-statistic is -1.3507, indicating how many standard deviations the observed sample mean (4.661) is below the hypothesized mean.
 
-    -   Mention that the 95% confidence interval for the mean weight of the plants ranges from approximately 4.09 to 5.23 grams, which includes the hypothesized mean of 5 grams.
+-   **Degrees of Freedom**: There are 9 degrees of freedom in this test, derived from the sample size minus one (n - 1).
 
--   **Implications**:
+-   **P-Value**: The p-value is 0.2098, which exceeds the common alpha threshold of 0.05. This high p-value suggests that there is not enough statistical evidence to reject the null hypothesis at the 5% significance level.
 
-    -   Discuss the implications of these results in terms of treatment effectiveness. The results suggest that the treatment does not significantly alter the plant growth from the expected 5 grams, implying that the treatment may not be effective in significantly enhancing growth beyond the hypothesized mean.
+-   **Confidence Interval**: The 95% confidence interval for the mean of the data ranges from 4.0932 to 5.2288. Notably, this interval includes the hypothesized mean of 5, further indicating that the observed mean does not significantly differ from 5 at the chosen level of confidence.
 
-### **Example 2: Two-Sample t-Test Using the `sleep` Dataset**
+-   **Sample Mean Estimate**: The sample mean estimated from **`trt1_data`** is 4.661, which is close but slightly below the hypothesized mean of 5.
+
+-   **Conclusion**: Based on the t-test results, we fail to reject the null hypothesis. There is insufficient evidence to conclude that the true mean of **`trt1_data`** is different from 5. The data does not show a statistically significant departure from the hypothesized mean, as indicated by both the p-value and the confidence interval that includes 5.
+
+-   **Contextual Interpretation**: This result suggests that the treatment or condition represented by **`trt1_data`** does not significantly alter the outcome measure to deviate from the expected mean of 5. This could be interpreted within the specific context of your study—whether assessing the effectiveness of a medical treatment, agricultural intervention, or another experimental treatment, the analysis suggests that the intervention does not significantly change the measured outcome from the expected norm.
+
+-   **A graphical representation:** To create a graphical representation of the trt1_data from the PlantGrowth dataset along with a comparison to the hypothesized mean of 5, we can use a combination of a boxplot (to show the distribution of the data) and a line indicating the hypothesized mean. This visualization will be done using R and the ggplot2 package for a clear and informative plot.
+
+    ```{r}
+    # Load necessary libraries
+    library(ggplot2)
+
+    # Load the data
+    data("PlantGrowth")
+    # Filter for 'trt1'
+    trt1_data <- PlantGrowth$weight[PlantGrowth$group == 'trt1']
+
+    # Create a boxplot with a line showing the hypothesized mean
+    ggplot(data = data.frame(Weight = trt1_data), aes(x = factor(1), y = Weight)) +
+      geom_boxplot(fill = "lightblue", colour = "darkblue") +  # Create the boxplot
+      geom_jitter(width = 0.1, color = "black", size = 2, alpha = 0.5) +  # Add jitter to show data points
+      geom_hline(aes(yintercept = 5), color = "red", linetype = "dashed", size = 1.5) + # Hypothesized mean
+      labs(title = "Boxplot of Plant Weights for Treatment 1 with Hypothesized Mean",
+           x = "Treatment 1",
+           y = "Weight") +
+      theme_minimal() +  # Use a minimal theme
+      theme(axis.title.x = element_blank())  # Remove the x-axis label
+
+    # Perform a one-sample t-test against the hypothesized mean of 5
+    t_test_result <- t.test(trt1_data, mu = 5)
+    print(t_test_result)
+    ```
+
+### **Example 3: A paired Samples t-Test**
+
+A paired samples t-test is used to compare the means of two samples when each observation in one sample can be paired with an observation in the other sample.
+
+For example, suppose we want to know whether or not a certain training program is able to increase the max vertical jump (in inches) of basketball players.
+
+To test this, we may recruit a simple random sample of 12 college basketball players and measure each of their max vertical jumps. Then, we may have each player use the training program for one month and then measure their max vertical jump again at the end of the month.
+
+For the scenario we described, where we are measuring the max vertical jump of basketball players before and after a training program, a paired samples t-test is appropriate. Here's how to conduct this hypothesis test following the outlined steps:
+
+#### Step 1: Formulate Hypotheses Null Hypothesis 
+
+(H₀): The training program has no effect on the max vertical jump of basketball players. This can be mathematically represented as: μ d ​ =0 where μ d ​ is the mean difference in max vertical jumps before and after the training program.
+
+Alternative Hypothesis (H₁): The training program has an effect on the max vertical jump of basketball players. This is represented as: μ d ≠ 0 ​
+
+#### Step 2: Choose a Suitable Test 
+
+In the scenario described, the paired samples t-test is an ideal statistical method because it specifically addresses situations where two sets of measurements are taken from the same subjects at different times or under different conditions. This kind of experimental design allows for controlling individual variability across the participants.
+
+#### Step 3: Compute the Test Statistic 
+
+```{r}
+#define before and after max jump heights
+before <- c(22, 24, 20, 19, 19, 20, 22, 25, 24, 23, 22, 21)
+after <- c(23, 25, 20, 24, 18, 22, 23, 28, 24, 25, 24, 20)
+
+#perform paired samples t-test
+paired_t_test_result <- t.test(x = before, y = after, paired = TRUE)
+
+```
+
+#### Step 4: Obtain and Interpret the p-value 
+
+```{r}
+print(paired_t_test_result)
+```
+
+The p-value provided in our test output is 0.02803. This p-value represents the probability of observing a test statistic as extreme as, or more extreme than, the value observed under the null hypothesis (which states that the mean difference in max vertical jumps before and after the training program is zero). Since the p-value is less than the typical alpha level of 0.05, this suggests there is statistically significant evidence against the null hypothesis.
+
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+Given that the p-value (0.02803) is less than the standard significance level (α = 0.05), we reject the null hypothesis. This decision indicates that there is statistically significant evidence to suggest that the training program has an effect on the max vertical jump heights of the basketball players.
+
+#### **Step 6: Report the Results**
+
+In reporting the results of this paired t-test, you would include the following elements:
+
+-   **Test Type**: Paired t-test.
+
+-   **T-Statistic**: -2.5289, which indicates that the post-training jumps are on average higher than the pre-training jumps (since we consider the negative sign in the context of our data, which was post minus pre).
+
+-   **Degrees of Freedom**: 11.
+
+-   **P-Value**: 0.02803, suggesting significant evidence against the null hypothesis.
+
+-   **Confidence Interval**: The 95% confidence interval for the mean difference in jump heights ranges from -2.3379 to -0.1621 inches. This interval does not include 0, further supporting the rejection of the null hypothesis.
+
+-   **Mean Difference**: -1.25 inches. The negative sign indicates an average increase in the jump height after the training program.
+
+-   **Conclusion**: The statistical analysis suggests that the training program significantly increased the max vertical jump heights of the basketball players by an average of 1.25 inches. This result is statistically significant, and thus the training program can be considered effective for improving vertical jump performance.
+
+-   **A graphical representation:** To create a visual representation of the changes in max jump heights before and after a training program, using the paired before and after data, you can employ a boxplot to show the distributions side by side, along with lines connecting each individual's before and after results. This will give a clear picture of how the training program impacted each individual's performance.
+
+    ```{r}
+    # Load necessary libraries
+    library(ggplot2)
+    library(reshape2)
+
+    # Define before and after max jump heights
+    before <- c(22, 24, 20, 19, 19, 20, 22, 25, 24, 23, 22, 21)
+    after <- c(23, 25, 20, 24, 18, 22, 23, 28, 24, 25, 24, 20)
+
+    # Create a data frame for plotting
+    jump_data <- data.frame(
+      Player = rep(1:12, 2),
+      Time = rep(c("Before", "After"), each = 12),
+      Height = c(before, after)
+    )
+
+    # Create a plot with lines connecting individual player's before and after heights
+    ggplot(jump_data, aes(x = Time, y = Height, group = Player)) +
+      geom_line(color = "blue", size = 1) +  # Draw lines connecting before and after
+      geom_point(aes(color = Time), size = 3, position = position_dodge(width = 0.2)) +  # Add points to show individual jumps
+      geom_boxplot(aes(fill = Time), alpha = 0.5, position = position_dodge(width = 0.2), outlier.shape = NA) +  # Add boxplots for overview
+      scale_fill_manual(values = c("lightblue", "lightgreen")) +  # Color for boxplots
+      scale_color_manual(values = c("darkblue", "darkgreen")) +  # Color for points
+      labs(title = "Comparison of Max Jump Heights Before and After Training",
+           x = "Condition",
+           y = "Max Jump Height (inches)") +
+      theme_minimal()  # Use a minimal theme for cleaner look
+
+    # Perform paired samples t-test
+    paired_t_test_result <- t.test(x = before, y = after, paired = TRUE)
+    print(paired_t_test_result)
+
+    ```
+
+### **Example 4: Two-Sample t-Test** 
+
+#### **Step 1: Formulate Hypotheses**
+
+-   **Null Hypothesis (H₀):** The mean height of corn type 1 is equal to the mean height of corn type 2. Mathematically, this can be expressed as:
+
+    μ1​=μ2​
+
+-   **Alternative Hypothesis (H₁):** The mean height of corn type 1 is not equal to the mean height of corn type 2. Mathematically, this is:
+
+    μ1​≠μ2​
+
+#### **Step 2: Choose a Suitable Test**
+
+For comparing the means of two independent samples, the appropriate test is the two-sample t-test. This test can be used under the assumption that the data are normally distributed within each group and that the variances of the two groups are equal (you can test for equal variances using an F-test if needed).
+
+#### **Step 3: Compute the Test Statistic**
+
+The test statistic for a two-sample t-test is calculated as follows:
+
+```{r}
+# Define the sample data
+sample1 <- c(155, 153, 149, 156, 151, 154, 152, 150)
+sample2 <- c(162, 158, 159, 161, 160, 157, 158, 159)
+
+# Perform a two-sample t-test assuming equal variances
+t_test_result <- t.test(sample1, sample2, alternative = "two.sided", var.equal = TRUE)
+
+```
+
+#### **Step 4: Obtain and Interpret the p-value**
+
+```{r}
+# Print the result
+print(t_test_result)
+```
+
+The p-value provided in our test output is $$1.545 \times 10^{-5}$$. This extremely small p-value suggests that the probability of observing a difference in mean heights as large or larger than what has been observed, under the assumption that there is no true difference (the null hypothesis), is about 0.00001545. This is much smaller than the typical alpha level of 0.05, indicating strong evidence against the null hypothesis.
+
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+
+Given that the p-value is significantly lower than the conventional significance level (α = 0.05), we reject the null hypothesis. This decision indicates that there is statistically significant evidence to conclude that the mean heights of the two types of corn are different.
+
+#### **Step 6: Report the Results**
+
+In reporting the results, we would note the following:
+
+-   **Test Type**: Two-sample t-test.
+
+-   **T-Statistic**: -6.4411, indicating the mean of sample1 is lower than the mean of sample2.
+
+-   **Degrees of Freedom**: 14.
+
+-   **P-Value**: Approximately $$1.545 \times 10^{-5}$$, which is very small.
+
+-   **Confidence Interval**: The 95% confidence interval for the difference in means ranges from -8.998 to -4.502. This interval does not include 0, further supporting the rejection of the null hypothesis.
+
+-   **Mean Estimates**: The mean height of corn in sample1 is 152.5 cm, and the mean height of corn in sample2 is 159.25 cm.
+
+-   **Conclusion**: There is significant statistical evidence to support that there is a difference in the average heights of the two corn types, with corn type 2 being taller on average than corn type 1.
+
+-   **A graphical representation:** To visualize the results from your two-sample t-test with a plot in R, using the **`sample1`** and **`sample2`** datasets, you can create side-by-side boxplots. These boxplots will show the distribution of each sample and make it easier to visually assess the differences between the two groups, in addition to your statistical t-test.
+
+```{r}
+# Load necessary library
+library(ggplot2)
+
+# Define the sample data
+sample1 <- c(155, 153, 149, 156, 151, 154, 152, 150)
+sample2 <- c(162, 158, 159, 161, 160, 157, 158, 159)
+
+# Combine the samples into a single data frame for plotting
+data <- data.frame(
+  Value = c(sample1, sample2),
+  Sample = factor(c(rep("Sample1", length(sample1)), rep("Sample2", length(sample2))))
+)
+
+# Create boxplots to visualize the distribution of each sample
+ggplot(data, aes(x = Sample, y = Value, fill = Sample)) +
+  geom_boxplot(alpha = 0.5) +  # Boxplot with semi-transparency
+  geom_jitter(width = 0.1, color = "black", size = 1.5, alpha = 0.7) +  # Add jitter to show data points
+  labs(title = "Comparison of Two Samples",
+       x = "Sample Group",
+       y = "Values") +
+  theme_minimal() +  # Use a minimal theme for a clean look
+  scale_fill_brewer(palette = "Pastel1")  # Use a color palette for distinction
+
+# Perform a two-sample t-test assuming equal variances
+t_test_result <- t.test(sample1, sample2, alternative = "two.sided", var.equal = TRUE)
+print(t_test_result)
+
+```
+
+### **Example 5: Two-Sample t-Test Using the `sleep` Dataset**
 
 #### **Step 1: Formulate Hypotheses**
 
@@ -302,10 +591,13 @@ Given that the p-value (0.2098) is greater than the common alpha level of 0.05, 
 ```{r}
 data("sleep")
 t_test_result <- t.test(extra ~ group, data = sleep)
-t_test_result
 ```
 
 #### **Step 4: Obtain and Interpret the p-value**
+
+```{r}
+print(t_test_result)
+```
 
 -   The p-value from the t-test output will indicate whether the differences in means are statistically significant. The p-value is 0.07939. This value tells us the probability of observing as extreme or more extreme differences between the two groups under the null hypothesis that there is no difference between them.
 
@@ -315,9 +607,47 @@ t_test_result
 
 #### **Step 6: Report the Results**
 
--   Present the t-test results, discuss the implications if the null hypothesis is rejected or not, and consider any potential limitations of the study. Although there appears to be a difference in the mean extra sleep favoring group 2, this difference isn't statistically significant at the conventional threshold. Clinically or practically, it suggests that further investigation with perhaps a larger sample size might be needed to conclusively determine if there indeed is a difference caused by the drugs, or if the observed difference was just by chance.
+-   **Test Type**: Welch Two Sample t-test, appropriate when the variances between two groups are not assumed to be equal.
 
-### **Example 3: ANOVA Test by Using ToothGrowth Dataset** 
+-   **Data Description**: The data compares extra sleep gained by subjects under two different sleep treatments.
+
+-   **Test Results:**
+
+    -   **T-Statistic**: -1.8608. This value indicates the direction and magnitude of the difference between the groups; negative suggests that group 1 had less increase in sleep compared to group 2.
+
+    -   **Degrees of Freedom**: 17.776, calculated based on the Welch-Satterthwaite equation, which adjusts for different variances.
+
+    -   **P-Value**: 0.07939. This value is above the conventional alpha level of 0.05, suggesting that the observed difference in means is not statistically significant at the 5% level.
+
+    -   **Confidence Interval**: The 95% confidence interval for the difference in means ranges from -3.365 to 0.205. Since zero is included within this interval, it suggests that the difference in mean extra sleep between the two groups could be zero (no effect), further supporting the lack of statistical significance.
+
+    -   **Mean Estimates**: Group 1 has a mean increase in sleep of 0.75 hours, while Group 2 has a mean increase of 2.33 hours.
+
+    **Conclusion**: There is insufficient evidence to reject the null hypothesis that there is no difference in mean sleep increase between the two treatment groups. The results suggest that any observed differences could be due to random chance.
+
+    **Practical Implication**: The data does not provide strong evidence to suggest that one treatment is more effective than the other in increasing sleep duration. Further research with a larger sample size or different experimental conditions might be necessary to draw more definitive conclusions.
+
+    **Graphical Representation:** To visualize these results, a boxplot showing the distribution of **`extra`** sleep for each group, overlaid with the means, will be informative.
+
+    ```{r}
+    # Load necessary library
+    library(ggplot2)
+
+    # Load the data
+    data("sleep")
+
+    # Create the boxplot with means
+    ggplot(sleep, aes(x = factor(group), y = extra, fill = factor(group))) +
+      geom_boxplot(alpha = 0.6) +  # Boxplot for each group with transparency
+      stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkred") +  # Overlay mean points
+      scale_fill_brewer(palette = "Pastel1") +  # Color fill
+      labs(title = "Comparison of Extra Sleep Between Two Groups",
+           x = "Group",
+           y = "Extra Sleep (hours)") +
+      theme_minimal()  # Use minimal theme for a cleaner look
+    ```
+
+### **Example 6: ANOVA Test by Using ToothGrowth Dataset** 
 
 ANOVA (Analysis of Variance) is a statistical method used to test differences between three or more group means to see if at least one group mean is statistically different from the others. For this example, let’s use the built-in **`ToothGrowth`** dataset in R, which measures the effect of vitamin C on tooth growth in guinea pigs. The dataset includes two key variables: **`len`** (length of tooth growth) and **`supp`** (type of supplement, either VC for Vitamin C or OJ for orange juice), and **`dose`** (dose level of the supplement).
 
@@ -333,7 +663,7 @@ We will perform a one-way ANOVA to compare the tooth growth (**`len`**) across d
 
 Given that the data involves comparing the means of tooth growth across more than two groups (different doses), and assuming the data meets necessary assumptions (normality, independence, and homogeneity of variances). Thus, ANOVA (Analysis of Variance) is appropriate as it allows comparing the means across three or more groups to determine if there is any statistically significant difference.
 
-### **Step 3: Compute the Test Statistic**
+#### **Step 3: Compute the Test Statistic**
 
 -   Load and check the dataset, and then compute the ANOVA:
 
@@ -353,7 +683,7 @@ anova_result <- aov(len ~ dose, data = ToothGrowth)
 summary(anova_result)
 ```
 
-### **Step 4: Obtain and Interpret the p-value**
+#### **Step 4: Obtain and Interpret the p-value**
 
 The output from the ANOVA (**`aov`**) function provides key statistics about the effects of **`dose`** on **`len`** (tooth length). Here's how to interpret the critical elements:
 
@@ -363,7 +693,7 @@ The output from the ANOVA (**`aov`**) function provides key statistics about the
 
 **Interpretation:** The extremely low p-value suggests that the differences in tooth growth across the three dose levels are statistically significant. The mean tooth growth is not the same for all dosage levels, with each increment likely having a different impact on growth outcomes.
 
-### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
+#### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
 
 -   **Alpha (α) Level:** Typically set at 0.05.
 
@@ -371,7 +701,7 @@ The output from the ANOVA (**`aov`**) function provides key statistics about the
 
 -   **Conclusion:** There is statistically significant evidence that different doses of vitamin C have different effects on tooth growth in guinea pigs.
 
-### **Step 6: Report the Results**
+#### **Step 6: Report the Results**
 
 -   **Summarize the Analysis:** Clearly state that the ANOVA revealed significant differences in tooth growth across the different doses of Vitamin C administered to guinea pigs.
 
@@ -385,7 +715,7 @@ post_hoc <- TukeyHSD(anova_result)
 print(post_hoc)
 ```
 
--   **Graphical Representation**: It might also be beneficial to include graphical summaries (e.g., box plots) to visually represent the differences between groups.
+**Graphical Representation**: It might also be beneficial to include graphical summaries (e.g., box plots) to visually represent the differences between groups.
 
 ```{r}
 boxplot(len ~ dose, data = ToothGrowth,
@@ -395,7 +725,7 @@ boxplot(len ~ dose, data = ToothGrowth,
         col = c("lightblue", "lightgreen", "pink"))
 ```
 
-### **Example 4: Chi-Square Test of Independence Using `UCBAdmissions` Dataset**
+### **Example 7: Chi-Square Test of Independence Using `UCBAdmissions` Dataset**
 
 #### **Step 1: Formulate Hypotheses**
 
@@ -439,7 +769,7 @@ print(chi_sq_result)
 
 -   This result is crucial for policy makers, educational administrators, and the broader academic community, highlighting the need for continuous monitoring and possibly recalibrating admission processes to ensure fairness and equity.
 
-### **Example 5: Simple Linear Regression Using the `mtcars` Dataset**
+### **Example 8: Simple Linear Regression Using the `mtcars` Dataset**
 
 #### **Step 1: Formulate Hypotheses**
 
@@ -462,16 +792,52 @@ summary(model)
 
 #### **Step 4: Obtain and Interpret the p-value**
 
--   The summary of the regression model will provide p-values for the slope coefficients, which indicate whether the relationship between weight and mpg is statistically significant.
+The linear regression output shows key statistics for the intercept and the slope (weight of the car, **`wt`**). The p-values associated with these coefficients provide evidence against the null hypothesis (that each coefficient is equal to zero):
 
--   Extremely small, providing strong evidence against the null hypothesis and indicating a statistically significant negative effect of weight on mpg.
+-   **Intercept (37.2851)**: The p-value is less than $1.29 \times 10^{-10}$ , indicating that the intercept is significantly different from zero.
+
+-   **Weight Coefficient (-5.3445)**: The p-value is $1.29 \times 10^{-10}$ , suggesting that there is a statistically significant negative relationship between car weight and miles per gallon. The negative coefficient indicates that as the weight increases, the miles per gallon decreases.
 
 #### **Step 5: Make a Decision Based on the p-value and Alpha (α)**
 
--   If **p-value ≤ 0.05** for the weight coefficient, reject H0; otherwise, fail to reject H0. We reject the Null that there is no relationship between the weight of cars (wt) and fuel efficiency (mpg).
+Given that both p-values are extremely small (well below the standard alpha level of 0.05), we reject the null hypotheses for both the intercept and the slope. This means that we have sufficient statistical evidence to affirm that the car's weight significantly affects its fuel efficiency (mpg).
 
 #### **Step 6: Report the Results**
 
--   Discuss the relationship between car weight and fuel efficiency, the strength of the relationship (R-squared), and any implications or recommendations for car design or consumer choice.
+When reporting the results of a linear regression, include a clear summary of the findings, the significance of the predictors, the goodness-of-fit measures, and any potential implications:
 
--   There is a need for lighter cars for better fuel efficiency.
+-   **Model Summary**: The regression equation from the analysis is $mpg=37.2851−5.3445×wt$ . This model explains that as the weight of the car increases by one unit, the fuel efficiency decreases by approximately 5.3445 miles per gallon.
+
+-   **Statistical Significance**: The coefficients for both the intercept and weight are statistically significant, with the intercept at $p < 2 \times 10^{-16}$ and the weight at $1.29 \times 10^{-10}$. This high level of significance suggests a robust model.
+
+-   **Goodness-of-Fit**: The model has a Multiple R-squared of 0.7528, indicating that approximately 75.28% of the variability in miles per gallon is explained by the car’s weight. The Adjusted R-squared of 0.7446 adjusts this figure for the number of predictors and the sample size, providing a more accurate measure of fit.
+
+-   **Model Diagnostics**: The residual standard error of 3.046 on 30 degrees of freedom indicates the typical deviation of the observed values from the regression line. The residuals, ranging from -4.5432 to 6.8727, should be examined for any patterns that suggest non-linearity, heteroscedasticity, or outliers.
+
+-   **Conclusion**: The analysis clearly demonstrates a significant negative relationship between car weight and fuel efficiency, suggesting that heavier cars tend to have lower mpg. This insight can be valuable for automotive design and consumer choices, particularly in contexts where fuel efficiency is a priority.
+
+-   **Graphical Representation**: Including a scatter plot with the regression line or diagnostics plots can further aid in the interpretation and validation of the model.
+
+```{r}
+# Load the necessary library for enhanced plotting capabilities
+library(ggplot2)
+
+# Perform the linear regression analysis
+model <- lm(mpg ~ wt, data = mtcars)
+
+# Create a scatter plot with a regression line
+plot <- ggplot(mtcars, aes(x = wt, y = mpg)) + # Define the aesthetics
+  geom_point() +                              # Add points for each observation
+  geom_smooth(method = "lm",                  # Add a regression line
+              se = TRUE,                      # Include a confidence band
+              color = "blue",                 # Color of the regression line
+              fill = "lightblue") +           # Color of the confidence interval
+  labs(title = "Relationship between Car Weight and MPG",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon") +
+  theme_minimal()                             # Use a minimal theme for a clean look
+
+# Display the plot
+print(plot)
+
+```
