@@ -10,7 +10,7 @@ execute:
 df-print: kable
 ---
 
-## Hypotheses Testing 
+## Hypotheses Testing
 
 Hypothesis testing is a fundamental concept in statistics that helps in making decisions based on data from a sample. That is, it is used to assess the evidence in the data and provides a methodology for making decisions using sample data.
 
@@ -51,7 +51,7 @@ Hypothesis testing is a fundamental concept in statistics that helps in making d
     -   If the p-value is less than the chosen significance level α, we reject the null hypothesis.
 
 ::: callout-note
-### 💡  **Court Case Analogy for Hypothesis Testing**
+### 💡 **Court Case Analogy for Hypothesis Testing**
 
 In a court case, a defendant is considered innocent until proven guilty. This setup is analogous to hypothesis testing in the following ways:
 
@@ -164,7 +164,7 @@ where:
 -   conf.level: The confidence level to use.
 :::
 
-### **Example 1: One-Sample t-Test** 
+### **Example 1: One-Sample t-Test**
 
 A one sample t-test is used to test whether or not the mean of a population is equal to a known value. For example, suppose agronomists have developed a new variety of corn and claim that its average height at maturity is different from the national average height of 150 cm for standard corn varieties.
 
@@ -393,17 +393,17 @@ To test this, we may recruit a simple random sample of 12 college basketball pla
 
 For the scenario we described, where we are measuring the max vertical jump of basketball players before and after a training program, a paired samples t-test is appropriate. Here's how to conduct this hypothesis test following the outlined steps:
 
-#### Step 1: Formulate Hypotheses Null Hypothesis 
+#### Step 1: Formulate Hypotheses Null Hypothesis
 
 (H₀): The training program has no effect on the max vertical jump of basketball players. This can be mathematically represented as: μ d ​ =0 where μ d ​ is the mean difference in max vertical jumps before and after the training program.
 
 Alternative Hypothesis (H₁): The training program has an effect on the max vertical jump of basketball players. This is represented as: μ d ≠ 0 ​
 
-#### Step 2: Choose a Suitable Test 
+#### Step 2: Choose a Suitable Test
 
 In the scenario described, the paired samples t-test is an ideal statistical method because it specifically addresses situations where two sets of measurements are taken from the same subjects at different times or under different conditions. This kind of experimental design allows for controlling individual variability across the participants.
 
-#### Step 3: Compute the Test Statistic 
+#### Step 3: Compute the Test Statistic
 
 ```{r}
 #define before and after max jump heights
@@ -415,7 +415,7 @@ paired_t_test_result <- t.test(x = before, y = after, paired = TRUE)
 
 ```
 
-#### Step 4: Obtain and Interpret the p-value 
+#### Step 4: Obtain and Interpret the p-value
 
 ```{r}
 print(paired_t_test_result)
@@ -481,7 +481,7 @@ In reporting the results of this paired t-test, you would include the following 
 
     ```
 
-### **Example 4: Two-Sample t-Test** 
+### **Example 4: Two-Sample t-Test**
 
 #### **Step 1: Formulate Hypotheses**
 
@@ -647,7 +647,7 @@ print(t_test_result)
       theme_minimal()  # Use minimal theme for a cleaner look
     ```
 
-### **Example 6: ANOVA Test by Using ToothGrowth Dataset** 
+### **Example 6: ANOVA Test by Using ToothGrowth Dataset**
 
 ANOVA (Analysis of Variance) is a statistical method used to test differences between three or more group means to see if at least one group mean is statistically different from the others. For this example, let’s use the built-in **`ToothGrowth`** dataset in R, which measures the effect of vitamin C on tooth growth in guinea pigs. The dataset includes two key variables: **`len`** (length of tooth growth) and **`supp`** (type of supplement, either VC for Vitamin C or OJ for orange juice), and **`dose`** (dose level of the supplement).
 
@@ -689,7 +689,9 @@ The output from the ANOVA (**`aov`**) function provides key statistics about the
 
 -   **F value:** 67.42, a measure of the variance ratio between the mean squares of the treatment and the residuals. This high value suggests a strong model fit.
 
--   **p-value:** 9.53e-16, extremely small, providing compelling evidence to reject the null hypothesis.**Interpretation**: Given the very low p-value, there is strong statistical evidence to reject the null hypothesis. This result suggests that different dose levels have significantly different effects on tooth growth.
+-   **p-value:** 9.53e-16, extremely small, providing compelling evidence to reject the null hypothesis.
+
+-   **Interpretation**: Given the very low p-value, there is strong statistical evidence to reject the null hypothesis. This result suggests that different dose levels have significantly different effects on tooth growth.
 
 **Interpretation:** The extremely low p-value suggests that the differences in tooth growth across the three dose levels are statistically significant. The mean tooth growth is not the same for all dosage levels, with each increment likely having a different impact on growth outcomes.
 
