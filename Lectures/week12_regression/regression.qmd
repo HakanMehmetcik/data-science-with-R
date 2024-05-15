@@ -96,20 +96,30 @@ Where:
 
 ### R Code for Fitting the Model
 
-```{r}
-# Sample Data
-set.seed(123)
-study_hours <- runif(100, 0, 10)  # Randomly generate study hours between 0 and 10
-test_scores <- 50 + 5 * study_hours + rnorm(100, mean=0, sd=5)  # Generate test scores
+Statistical models to explore the relationship a response (dependent) and explanatory (independent variable)With regression, you can predict the values of the response variable with the use of given values of explanatory variable.
 
-# Fit Linear Regression Model
-model <- lm(test_scores ~ study_hours)
-summary(model)
+👋 Make sure that you know the followings!
 
+-   **linear regression :** when the response variable is numeric
 
-```
+-   **logistic regression:** when the response variable is logical (True -false)
 
-Statistical models to explore the relationship a response (dependent) and explanatory (independent variable)With regression, you can predict the values of the response variable with the use of given values of explanatory variable.👋 Make sure that you know the followings!**linear regression :** when the response variable is numeric**logistic regression:** when the response variable is logical (True -false)**simple linear/logistic regression:** when there is one explanatory variable**multiple linear/logistic regression:** when there is more than one explanatory variable💡 Here is a a list of possible linear relations:![](images/clipboard-832738691.png)👋 **lm() function to simulate linear models in R:**In R, linear models are typically fitted using the `lm()` function. This function fits a linear model to data by finding the line of best fit that minimizes the total error of the model.Here's an example of how you might use it:\`\`\`{r}# Create some datax \<- c(1, 2, 3, 4, 5)y \<- c(2, 3, 5, 7, 11)# Fit a linear modelmodel \<- lm(y \~ x)# Print the model summarysummary(model)
+-   **simple linear/logistic regression:** when there is one explanatory variable
+
+-   **multiple linear/logistic regression:** when there is more than one explanatory variable
+
+-   👋 **lm() function to simulate linear models in R:**In R, linear models are typically fitted using the `lm()` function. This function fits a linear model to data by finding the line of best fit that minimizes the total error of the model.
+
+    ```{r}
+    # Sample Data
+    set.seed(123)
+    study_hours <- runif(100, 0, 10)  # Randomly generate study hours between 0 and 10
+    test_scores <- 50 + 5 * study_hours + rnorm(100, mean=0, sd=5)  # Generate test scores
+
+    # Fit Linear Regression Model
+    model <- lm(test_scores ~ study_hours)
+    summary(model)
+    ```
 
 In this code, `lm(y ~ x)` fits a linear model to the data with `y` as the response variable and `x` as the predictor variable. The `summary(model)` function then prints a summary of the model, including the coefficients, residuals, and other diagnostic measures.
 
@@ -558,8 +568,6 @@ What best describes how the men's pole vault world record has changed since 1970
 # Categorical Explanatory Variables
 
 Categorical variables require special attention in regression analysis because, unlike dichotomous or continuous variables, they cannot by entered into the regression equation just as they are.  Instead, they need to be recoded into a series of variables which can then be entered into the regression model.  There are a variety of coding systems that can be used when recoding categorical variables.  Regardless of the coding system you choose, the overall effect of the categorical variable will remain the same. Ideally, you would choose a coding system that reflects the comparisons that you want to make.  For example, you may want to compare each level of the categorical variable to the lowest level (or any given level).  In that case you would use a system called **simple coding**.  Or you may want to compare each level to the next higher level, in which case you would want to use **repeated coding**.  By deliberately choosing a coding system, you can obtain comparisons that are most meaningful for testing your hypotheses. Below is a table listing various types of contrasts and the comparison that they make. **We should note that some forms of coding make more sense with ordinal categorical variables than with nominal categorical variables!**
-
-![](images/Screenshot%202022-12-20%20at%2014.10.18.png)
 
 ## Exercise 1:
 
