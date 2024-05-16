@@ -62,15 +62,19 @@ Regression analysis is a fundamental method used in inferential statistics, comp
 
 ### 1. Linear Regression
 
-This is the simplest form where the relationship between the dependent variable and one or more independent variables is assumed to be linear. It is expressed as:
+This is the simplest form where the relationship between the dependent variable and one or more independent variables is assumed to be linear.
 
-$$ Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \ldots + \beta_nX_n + \epsilon $$
+It is expressed as:
 
-Here, `Y` is the dependent variable, `X_1, X_2, ..., X_n` are the independent variables, `\beta_0, \beta_1, ..., \beta_n` are the coefficients, and `\epsilon` is the error term.
+$$ Y = \beta_0 + \beta_1X_1 + \epsilon $$
+
+Here, `Y` is the dependent variable, `X_1` is the independent variables, $\beta_0$ , $\beta_1$ are the coefficients, and $\epsilon$ is the error term.
 
 ### 2. Multiple Regression
 
 Extends linear regression by using multiple independent variables to better predict the outcome.
+
+$ Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \ldots + \beta_nX_n + \epsilon $$ Here, `Y` is the dependent variable, `X_1, X_2, ..., X_n` are the independent variables, $\beta_0$ , $\beta_1$ $\beta_2$ ...and $\beta_n$ are the coefficients, and $\epsilon$ is the error term.
 
 ### 3. Logistic Regression
 
@@ -83,61 +87,6 @@ Regression analysis in inferential statistics is utilized to:
 -   **Estimate Relationships**: It helps in determining the strength and significance of relationships between variables.
 -   **Predict Outcomes**: Based on the regression model, it predicts values of the dependent variable for given values of independent variables.
 -   **Test Hypotheses**: It tests specific hypotheses about the relationships among variables, such as whether the impact of predictors is significant.
-
-## Example: Regression for Inference
-
-Consider a scenario where a researcher is investigating the effect of study hours (`X`) on test scores (`Y`). The simple linear regression model can be:
-
-$$ Y = \beta_0 + \beta_1X + \epsilon $$
-
-Where:
-
--   `\beta_0` is the intercept (expected test score when study hours are zero),
--   `\beta_1` is the slope (expected increase in test score for each additional hour of study),
--   `\epsilon` is the error term.
-
-### R Code for Fitting the Model
-
-Statistical models to explore the relationship a response (dependent) and explanatory (independent variable)With regression, you can predict the values of the response variable with the use of given values of explanatory variable.
-
-👋 Make sure that you know the followings!
-
--   **linear regression :** when the response variable is numeric
-
--   **logistic regression:** when the response variable is logical (True -false)
-
--   **simple linear/logistic regression:** when there is one explanatory variable
-
--   **multiple linear/logistic regression:** when there is more than one explanatory variable
-
--   👋 **lm() function to simulate linear models in R:**In R, linear models are typically fitted using the `lm()` function. This function fits a linear model to data by finding the line of best fit that minimizes the total error of the model.
-
-    ```{r}
-    # Sample Data
-    set.seed(123)
-    study_hours <- runif(100, 0, 10)  # Randomly generate study hours between 0 and 10
-    test_scores <- 50 + 5 * study_hours + rnorm(100, mean=0, sd=5)  # Generate test scores
-
-    # Fit Linear Regression Model
-    model <- lm(test_scores ~ study_hours)
-    summary(model)
-    ```
-
-In this code, `lm(y ~ x)` fits a linear model to the data with `y` as the response variable and `x` as the predictor variable. The `summary(model)` function then prints a summary of the model, including the coefficients, residuals, and other diagnostic measures.
-
-⚠️ The **`summary()`** function provides a lot of information. Here's what some of it means:
-
--   **Call**: This shows the function call that you used to fit the model. (`lm(y ~ x) in the example above)`
-
--   **Residuals**: This section provides summary statistics for the residuals, which are a measure of how far off our model's predictions are for each point.
-
--   **Coefficients**: This is one of the most important parts of the output. It gives the coefficients of the model, the standard error of these coefficients, and the t-value and p-value of the hypothesis test that the coefficient is different from 0. The "Estimate" column gives the coefficients of the intercept and the predictor variable(s). In this case, the coefficient for **`x`** is the slope of the line of best fit.
-
--   **Residual standard error**: This is the standard deviation of the residuals. It gives a measure of how wrong our model's predictions are likely to be.
-
--   **Multiple R-squared**: This is the proportion of variance in the response variable that can be explained by the predictor variables. It provides a measure of how well the model fits the data.
-
--   **F-statistic and p-value**: The F-statistic is a measure of how much better the model fits the data than a model that has no predictor variables. The p-value associated with this F-statistic is the probability of observing such an F-statistic, or one more extreme, under the null hypothesis that the model with no predictor variables fits the data as well as our model.
 
 ## Exercise 1:
 
@@ -188,9 +137,60 @@ A freshman learned of this study and calculated that she would need to spend \$2
 
 **Answer** : Of course not. No!
 
+## Regression in R 
+
+👋 **lm() function to simulate linear models in R:** In R, linear models are typically fitted using the `lm()` function. This function fits a linear model to data by finding the line of best fit that minimizes the total error of the model.
+
+```{r}
+# Sample Data
+set.seed(123)
+study_hours <- runif(100, 0, 10)  # Randomly generate study hours between 0 and 10
+test_scores <- 50 + 5 * study_hours + rnorm(100, mean=0, sd=5)  # Generate test scores
+
+# Fit Linear Regression Model
+model <- lm(test_scores ~ study_hours)
+summary(model)
+```
+
+In this code, `lm(y ~ x)` fits a linear model to the data with `y` as the response variable and `x` as the predictor variable. The `summary(model)` function then prints a summary of the model, including the coefficients, residuals, and other diagnostic measures.
+
+⚠️ The **`summary()`** function provides a lot of information. Here's what some of it means:
+
+1.  **Call**:
+
+    -   **`lm(formula = test_scores ~ study_hours)`**: This shows the model used, predicting **`test_scores`** as a function of **`study_hours`**.
+
+2.  **Residuals**:
+
+    -   The residuals are the differences between the observed values and the values predicted by the model. These values (**`Min`**, **`1Q`** (first quartile), **`Median`**, **`3Q`** (third quartile), and **`Max`**) describe the distribution of residuals. Smaller residuals suggest a better fit of the model to the data.
+
+3.  **Coefficients**:
+
+    -   **`(Intercept)`**: The estimated value of **`test_scores`** when **`study_hours`** is 0. It's about 49.9552.
+
+    -   **`study_hours`**: The estimated increase in **`test_scores`** for each additional hour of study. It's about 4.9551 per hour.
+
+    -   **Std. Error**: Measures the accuracy of the coefficients' estimates.
+
+    -   **t value**: The t-statistic, a measure of how many standard deviations the coefficient is away from 0. Larger absolute values suggest more significant coefficients.
+
+    -   **Pr(\>\|t\|)**: The p-value for the hypothesis test that the coefficient equals 0. Values smaller than 0.05 typically suggest the coefficient significantly differs from 0 at the 5% significance level. Both coefficients are significant (**`<2e-16`**).
+
+4.  **Residual standard error**: About 4.846, this is the average amount that the response will deviate from the true regression line. It's an estimate of the standard deviation of the residuals.
+
+5.  **Degrees of freedom**: The model used 98 degrees of freedom (100 observations - 2 parameters).
+
+6.  **Multiple R-squared**: 0.8956, explains the proportion of variance in the dependent variable that's predictable from the independent variable. Here, about 89.56% of the variability in **`test_scores`** can be explained by **`study_hours`**.
+
+7.  **Adjusted R-squared**: 0.8945, this is the R-squared adjusted for the number of predictors and is usually lower than the R-squared. It's a better measure when comparing models with different numbers of predictors.
+
+8.  **F-statistic**: 840.6 on 1 and 98 DF, this is a measure of how well the model fits as a whole, tested by comparing to a model with no predictors. The very low p-value (**`< 2.2e-16`**) indicates the model is statistically significant.
+
+Overall, this output suggests that the model fits well, with **`study_hours`** being a significant predictor of **`test_scores`**. Both the intercept and the slope are statistically significant, meaning both contribute meaningfully to the model. The residuals seem well distributed, and the model explains a significant amount of variability in the test scores.
+
 ## Exercise 2:
 
-let’s consider another question from the airline delays data set: What impact, if any, does scheduled time of departure have on expected flight delay? Many people think that earlier flights are less likely to be delayed, since flight delays tend to cascade over the course of the day. Is this theory supported by the data?
+Let’s consider another question from the airline delays data set: What impact, if any, does scheduled time of departure have on expected flight delay? Many people think that earlier flights are less likely to be delayed, since flight delays tend to cascade over the course of the day. Is this theory supported by the data?
 
 We first begin by considering time of day. In the **nycflights13** package, the `flights` data frame has a variable (`hour`) that specifies the *scheduled* hour of departure.
 
