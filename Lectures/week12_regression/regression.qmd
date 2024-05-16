@@ -50,7 +50,9 @@ No, beacuse when F=57 R=750 or R=1250.
 
 👋 In statistics, **a distribution is a function that shows the possible values for a variable and how often they occur**. It's a description of the relative numbers of times each possible outcome will occur in a number of trials. Distributions can be represented in various ways, such as with graphs or probability tables.
 
-# Simple Linear Regression
+## Statisitcal Modeling
+
+Statistical modeling provides a way to relate variables to one another. Doing so helps us better understand the system we are studying. Regression is the simplest modeling in statistic.
 
 ## Introduction to Regression Analysis
 
@@ -188,6 +190,153 @@ A freshman learned of this study and calculated that she would need to spend \$2
 
 ## Exercise 2:
 
+let’s consider another question from the airline delays data set: What impact, if any, does scheduled time of departure have on expected flight delay? Many people think that earlier flights are less likely to be delayed, since flight delays tend to cascade over the course of the day. Is this theory supported by the data?
+
+We first begin by considering time of day. In the **nycflights13** package, the `flights` data frame has a variable (`hour`) that specifies the *scheduled* hour of departure.
+
+```{r}
+library(tidyverse)
+library(mdsr)
+library(nycflights13)
+SF <- flights |>
+  filter(dest == "SFO", !is.na(arr_delay))
+SF |>
+  group_by(hour) |>
+  count() |>
+  pivot_wider(names_from = hour, values_from = n) |>
+  data.frame()
+```
+
+We see that many flights are scheduled in the early to mid-morning and from the late afternoon to early evening. None are scheduled before 5 am or after 10 pm. Let’s examine how the arrival delay depends on the hour. We’ll do this in two ways: first using standard box-and-whisker plots to show the distribution of arrival delays; second with a [*linear model*](https://en.wikipedia.org/w/index.php?search=linear%20model) that lets us track the mean arrival delay over the course of the day.
+
+```{r}
+SF |>
+  ggplot(aes(x = hour, y = arr_delay)) +
+  geom_boxplot(alpha = 0.1, aes(group = hour)) +
+  geom_smooth(method = "lm") + 
+  xlab("Scheduled hour of departure") + 
+  ylab("Arrival delay (minutes)") + 
+  coord_cartesian(ylim = c(-30, 120)) 
+```
+
+Figure above displays the arrival delay versus schedule departure hour. The average arrival delay increases over the course of the day. The trend line itself is created via a regression model.
+
+```{r}
+mod1 <- lm(arr_delay ~ hour, data = SF)
+broom::tidy(mod1)
+```
+
+The number under the “estimate” for `hour` indicates that the arrival delay is predicted to be about 2 minutes higher per hour. Over the 15 hours of flights, this leads to a 30-minute increase in arrival delay comparing flights at the end of the day to flights at the beginning of the day. The `tidy()` function from the **broom** package also calculates the standard error: 0.09 minutes per hour. Stated as a 95% confidence interval, this model indicates that we are 95% confident that the true arrival delay increases by 2.0±0.18 minutes per hour.
+
+The rightmost column gives the [*p-value*](https://en.wikipedia.org/w/index.php?search=p-value), a way of translating the estimate and standard error onto a scale from zero to one. By convention, p-values below 0.05 provide a kind of certificate testifying that random, accidental patterns would be unlikely to generate an estimate as large as that observed. The tiny p-value given in the report (`2e-16` is 0.0000000000000002) is another way of saying that if there was no association between time of day and flight delays, we would be *very* unlikely to see a result this extreme or more extreme.
+
+Can we do better? What additional factors might help to explain flight delays? Let’s look at departure airport, carrier (airline), month of the year, and day of the week. Some wrangling will let us extract the day of the week (dow) from the year, month, and day of month. We’ll also create a variable season that summarizes what we already know about the month: that June and July are the months with long delays. These will be used as explanatory variables to account for the response variable: arrival delay.
+
+```{r}
+library(lubridate)
+SF <- SF |> 
+  mutate(
+    day = as.Date(time_hour), 
+    dow = as.character(wday(day, label = TRUE)),
+    season = ifelse(month %in% 6:7, "summer", "other month")
+  )
+```
+
+Now we can build a model that includes variables we want to use to explain arrival delay.
+
+```{r}
+mod2 <- lm(arr_delay ~ hour + origin + carrier + season + dow, data = SF)
+broom::tidy(mod2)
+```
+
+The numbers in the “estimate” column tell us that we should add 4.1 minutes to the average delay if departing from `JFK` (instead of `EWR`, also known as [*Newark*](https://en.wikipedia.org/w/index.php?search=Newark), which is the reference group). Delta has a better average delay than the other carriers. Delays are on average longer in June and July (by 25 minutes), and on Sundays (by 5 minutes). Recall that the Aviana crash was in July.
+
+The model also indicates that Sundays are associated with roughly 5 minutes of additional delays; Saturdays are 6 minutes less delayed on average. (Each of the days of the week is being compared to Friday, chosen as the reference group because it comes first alphabetically.) The standard errors tell us the precision of these estimates; the p-values describe whether the individual patterns are consistent with what might be expected to occur by accident even if there were no systemic association between the variables.
+
+In this example, we’ve used `lm()` to construct what are called [*linear models*](https://en.wikipedia.org/w/index.php?search=linear%20models). Linear models describe how the mean of the response variable varies with the explanatory variables. They are the most widely used statistical modeling technique, but there are others.
+
+In particular, since our original motivation was to set a policy about business travel, we might want a modeling technique that lets us look at another question: What is the probability that a flight will be, say, greater than 100 minutes late? Without going into detail, we’ll mention that a technique called [*logistic regression*](https://en.wikipedia.org/w/index.php?search=logistic%20regression) is appropriate for such [*dichotomous*](https://en.wikipedia.org/w/index.php?search=dichotomous) outcomes.
+
+### **Confounding and accounting for other factors**
+
+We drill the mantra [*correlation does not imply causation*](https://en.wikipedia.org/w/index.php?search=correlation%20does%20not%20imply%20causation) into students whenever statistics are discussed. While the statement is certainly true, it may not be so helpful.
+
+There are many times when correlations *do* imply causal relationships (beyond just in carefully conducted [*randomized trials*](https://en.wikipedia.org/w/index.php?search=randomized%20trials)). A major concern for observational data is whether the true associations are being distorted by *other factors* that may be the actual determinants of the observed relationship between two factors. Such other factors may [*confound*](https://en.wikipedia.org/w/index.php?search=confound) the relationship being studied.
+
+Randomized trials in scientific experiments are considered the gold standard for evidence-based research. Such trials, sometimes called [*A/B tests*](https://en.wikipedia.org/w/index.php?search=A/B%20tests), are commonly undertaken to compare the effect of a treatment (e.g., two different forms of a Web page). By controlling who receives a new intervention and who receives a control (or standard treatment), the investigator ensures that, on average, all other factors are balanced between the two groups. This allows them to conclude that if there are differences in the outcomes measured at the end of the trial, they can be attributed to the application of the treatment. (It’s worth noting that randomized trials can also have confounding if subjects don’t comply with treatments or are lost on follow-up.)
+
+While they are ideal, randomized trials are not practical in many settings. It is not ethical to randomize some children to smoke and the others not to smoke in order to determine whether cigarettes cause lung cancer. It is not practical to randomize adults to either drink coffee or abstain to determine whether it has long-term health impacts. Observational (or “found”) data may be the only feasible way to answer important questions.
+
+Let’s consider an example of confounding using observational data on average teacher salaries (in 2010) and average total SAT scores for each of the 50 United States. The SAT ([*Scholastic Aptitude Test*](https://en.wikipedia.org/w/index.php?search=Scholastic%20Aptitude%20Test)) is a high-stakes exam used for entry into college. Are higher teacher salaries associated with better outcomes on the test at the state level? If so, should we adjust salaries to improve test performance? [Figure 9.4](https://mdsr-book.github.io/mdsr3e/09-foundations.html#fig-sat1) displays a scatterplot of these data. We also fit a linear regression model.
+
+```{r}
+SAT_2010 <- SAT_2010 |>
+  mutate(Salary = salary/1000)
+SAT_plot <- ggplot(data = SAT_2010, aes(x = Salary, y = total)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") + 
+  ylab("Average total score on the SAT") + 
+  xlab("Average teacher salary (thousands of USD)")
+SAT_plot
+```
+
+```{r}
+SAT_mod1 <- lm(total ~ Salary, data = SAT_2010)
+broom::tidy(SAT_mod1)
+```
+
+Lurking in the background, however, is another important factor. The percentage of students who take the SAT in each state varies dramatically (from 3% to 93% in 2010). We can create a variable called `SAT_grp` that divides the states into two groups.
+
+```{r}
+SAT_2010 |>
+  skim(sat_pct)
+```
+
+```{r}
+SAT_2010 <- SAT_2010 |>
+  mutate(SAT_grp = ifelse(sat_pct <= 27, "Low", "High"))
+SAT_2010 |>
+  group_by(SAT_grp) |>
+  count()
+```
+
+Now, let's visualize this with a scatterplot of these data stratified by the grouping of percentage taking the SAT.
+
+```{r}
+SAT_plot %+% SAT_2010 + 
+  aes(color = SAT_grp) + 
+  scale_color_brewer("% taking\nthe SAT", palette = "Set2")
+```
+
+we can derive the coefficients of the linear model fit to the two separate groups.
+
+```{r}
+SAT_2010 |>
+  group_by(SAT_grp) |>
+  group_modify(~broom::tidy(lm(total ~ Salary, data = .x)))
+```
+
+For each of the groups, average teacher salary is positively associated with average SAT score. But when we collapse over this variable, average teacher salary is negatively associated with average SAT score. This form of confounding is a quantitative version of [*Simpson’s paradox*](https://en.wikipedia.org/w/index.php?search=Simpson%27s%20paradox) and arises in many situations. It can be summarized in the following way:
+
+-   Among states with a low percentage taking the SAT, teacher salaries and SAT scores are positively associated.
+
+-   Among states with a high percentage taking the SAT, teacher salaries and SAT scores are positively associated.
+
+-   Among all states, salaries and SAT scores are negatively associated.
+
+Addressing confounding is straightforward if the confounding variables are measured. Stratification is one approach (as seen above). Multiple regression is another technique. Let’s add the `sat_pct` variable as an additional predictor into the regression model.
+
+```{r}
+SAT_mod2 <- lm(total ~ Salary + sat_pct, data = SAT_2010)
+broom::tidy(SAT_mod2)
+```
+
+We now see that the slope for `Salary` is positive and statistically significant when we control for `sat_pct`. This is consistent with the results when the model was stratified by `SAT_grp`.
+
+We still can’t really conclude that teacher salaries cause improvements in SAT scores. However, the associations that we observe after accounting for the confounding are likely more reliable than those that do not take those factors into account.
+
+### Exercise 3:
+
 For this exercise, we have Swedish Motor Insurance dataset, which was compiled by the Swedish Committee on the Analysis of Risk Premium in Motor Insurance. The data are cross-sectional, describing third party automobile insurance claims for the year 1977. The outcomes of interest are the number of claims (the frequency) and sum of payments (the severity), in Swedish kroners. Outcomes are based on 5 categories of distance driven by a vehicle, broken down by 7 geographic zones, 7 categories of recent driver claims experience and 9 types of automobile.
 
 ```{r}
@@ -262,7 +411,7 @@ payment = -3362 + 5020\*Claims
 
 That is, every new claim results in 5020 SEK payment with an initial negative of 3362, which basically says if no claims there would be gain of 3362 for insurance companies. This model could be meaningful depending on the context. If the negative intercept makes sense in your context (i.e., the insurance company has other sources of income or factors that could lead to a gain even when there are no claims), then the model could be valid. However, if the negative intercept doesn’t make sense (i.e., it’s not possible for the insurance company to have a gain when there are no claims), you might want to reconsider the model.
 
-## Exercise 3:
+## Exercise 4:
 
 We have compiled the world record times for track events like the 100m dash and record distances for field events like the shotput into a single dataset.  This dataset includes information on the person who broke the record, his/her nationality, where the record was broken, and the year it was broken.  Note that not all world records are broken during the Olympics, with many occurring in regional or national competitions.
 
@@ -409,7 +558,7 @@ It can be argued that given the slope of 0.23, The rate of change is greater for
 
 Based on scatterplots of the men's and women's world record shotput distance, both of these events follow a strong, **positive** linear relationship over time. The men's world record distance increases by an average of 0.13 meters per year, while the women's record distance increases by an average of 0.23 meters per year. Because the intercept estimate is the value of the record distance when **year** is equal to 0, it is not interpretable in the context of the problem. To correct this, we have **transpoze** the year variable by using the minimum year as 0. Both transpozed linear models fit the data well, with R-squared values for the men's and women's models equal to 17.9 and 14.83, respectively. Overall, the rate of change record per unit increase in year is greater for women than for men.
 
-## Exercise 4
+## Exercise 5:
 
 Keep on working with World Record Data set. Now, our **Reserach Questions** is "How have world record times for the men's and women's mile event changed over the years?"
 
@@ -501,7 +650,7 @@ World record times in the Mile have decreased linearly over the last several dec
 
 Based on scatterplots of the men's and women's world record mile event, both of these events follow a strong, **negative** relationship over time. For both groups, the assumption of linearity appears to be satisﬁed. The men's world record mile time decreases by an average of 0.393 seconds per year, while the women's record distance decreases by an average of 0.976 seconds per year. Because the intercept estimate is the value of the record time when year is equal to 0, it is not interpretable in the context of the problem. Both linear models ﬁt the data well, with R-squared values for the men's and women's models equal to 0.976 and 0.886 , respectively. For the men's world record, 97.7% of the correct is explained by the linear model of year, while for the female world record, 88.6% of the correct in performance can be explained by the linear model of year.
 
-## Exercise 4
+## Exercise 6:
 
 Keep on working with World Record Data set. Now, **We want to find the best-fitting linear model for men's pole vault world records since 1970.**
 
