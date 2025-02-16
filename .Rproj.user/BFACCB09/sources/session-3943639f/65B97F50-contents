@@ -1,0 +1,664 @@
+---
+title: "week7: Exercise 1"
+author: "Hakan Mehmetcik"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: true
+  output: asis
+df-print: kable
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+# loaded packages
+library(tidyverse)
+library(here)
+dpath <- "Lectures/week7_exercises"
+```
+
+# Exercise 1: Exploring the Data
+
+## Reading the Data
+
+Let’s first read in a dataset called simd2020.csv, which is the 2020 Scottish Index of Multiple Deprivation (SIMD) for all Scottish datazones.[^1]
+
+[^1]: A datazone is a small geographical area, here of Scotland. The datazones in the SIMD are nested in council ar- eas, are roughly equal sized (500 to 1,000 people), and are constructed to maintain physical and natural communities (www.gov.scot/Topics/Statistics/SIMD/FAQUsingSIMD)
+
+```{r}
+#| warning: false
+#| error: false
+simd2020 <- read_csv(here(dpath, "simd2020.csv"), na="*")
+```
+
+::: callout-note
+👋 In the read_csv() function, we include the name of the file ("simd2020.csv") and we also specify how the missing values are characterized in the .csv file. We will deal more explicitly with missing values later on, but for now we include the option na="*", where na means ‘not available’ and* is how missing values are represented in the raw SIMD data. This ensures that missing values from the .csv data file are coded in the way that R recognizes missing values (i.e., "NA").
+:::
+
+::: callout-note
+⚠️ It is always a good practice if you read the data description (or the so-called code-book) first, before to work on any data!
+:::
+
+## Examining Dataset
+
+There are a few different ways using base R and tidyverse to look at the dataset. The first option is to ‘view’ the dataset using the view() function from the tibble package. We put the name of the dataset object into the parentheses of view(). This opens up a new tab in RStudio where we can see all the variables and observations. The view() function is the lower-case version of the View() function in base R.
+
+```{r}
+view(simd2020)
+```
+
+Another way to take a quick look at the variables in our data is using the names() function. This function provides the names of all the variables in our dataset, and is particularly useful when performing analysis and we cannot remember the particular name of a certain variable.
+
+```{r}
+names(simd2020)
+```
+
+We can also look at the class of the dataset using the class() function. This is important as R functions require that data are specified as certain classes.
+
+```{r}
+class(simd2020)
+```
+
+::: callout-note
+💡 This shows four different classes, where tbl stands for tibble. Note that the data is also classified as a data.frame which is the standard data frame class and would be the only class listed if we used read.csv(). Therefore, our dataset will work for tidyverse and non-tidyverse functions.
+:::
+
+## Examining Variables
+
+Now that we have correctly read in and taken a quick look at our data, we want to examine the contents of our variables. There are a number of things we might want to look at in our variables, but we are usually most interested in the variable type. At the most basic level, we want to know whether our variables are numeric or string/character. Numeric variables are composed of numbers, while string or character variables are composed of letters or symbols. We likely already know whether our variables are numeric or string/character, but sometimes when we read data into R, variables will be misclassified. For example, numeric variables wind up mischaracterised as string/character variables. Since our data analysis is, usually, dependent on numbers, we will not be able to perform statistical analysis with string/character variables. That is why it is always good practice to make sure that our variables are the correct variable type from the start. The next thing we are concerned about are whether our numeric variables are being treated as numeric (the values imply some order), integer (numeric variables that only include integers), or whether they are treated as factor (variables whose numeric values do not have order). As with numeric and string/character variables, we probably know whether the variables should be numeric or factor. With factor variables, we are restricted from doing certain types of statistical analysis. Tidyverse follows base R in classifying variable types, but it uses slightly different terminology in places. When we read-in data using tidyverse() functions, the numeric variables are specified as col_double(), integer variables are specified as col_integer(), string/character variables are specified as col_character(), and factor variables are specified as col_factor(). The prefix col\_ simply refers to ‘column’, where ‘column’ is the generalized term for what we are calling ‘variables’. We can see the specifications (i.e., classifications) by using the spec() function from the readr package.
+
+```{r}
+spec(simd2020)
+```
+
+This shows we have 3 variables specified as character and the rest are classified as double. We actually saw a summary of this information when we used the read_csv() function, but here it is provided for each variable. To get a quick look at our variables, we can use the glimpse() function from the pillar package; pillar is not part of tidyverse, but tidyverse automatically imports pillar functions when loaded. The glimpse() function is the tibble-friendly version of the str() function.
+
+```{r}
+glimpse(simd2020)
+```
+
+The output provides a summary of the number of rows and columns (which is the same information as in the Environment window), the variable names, the classification type of each variable, and the first few values of each variable. This output is most useful for checking the variable classifications and whether any wonky values are present. For example, we see that a number of variables (e.g., ALCOHOL) have many numbers to the right of the decimal point. Depending on our analysis goals, we likely will want to round these variables to have only 2 or 3 decimal places. Also, notice that the specification types are abbreviations - here, we have <chr> for a character variable and <dbl> for a double variable. If we are only interested in a single variable’s classification, we can use the class() function. Unless we create a separate object for the variable, we need to tell R what dataset the variable belongs to. We do this by specifying the name of the dataset, then include a dollar sign (\$), followed by the name of the variable. Let’s look at the variable Council_area:
+
+```{r}
+class(simd2020$Council_area)
+```
+
+We see that the variable type is character for Council_area. We can do the same for any variable in our dataset. If we want to look at the first few rows of a variable, we can use the head() function.
+
+```{r}
+head(simd2020$Council_area)
+```
+
+This shows that the first few observations are “Aberdeen City”. If we want to look at the last few rows of a variable, we can use the tail() function.
+
+```{r}
+tail(simd2020$Council_area)
+```
+
+This shows that the last few observations are “West Lothian”.
+
+We can also get basic statistical summaries of our variables by using the summary() function. Depending on the variable type, we will get different statistical summaries. First, let’s look at Total_population which is a double variable.
+
+```{r}
+summary(simd2020$Total_population)
+```
+
+This provides the minimum, maximum, median, mean, and first and third quartiles. Now, let’s look at Council_area, which is a character variable.
+
+```{r}
+summary(simd2020$Council_area)
+```
+
+Since Council_area is a character variable, R only gives us the total number of observations, the class, and a mode of character. For examining Council_area, this output is not useful.
+
+Instead of using the summary() function, we can use two different options to see the values for character and factor variables. First, let’s use the table() function to see all the council areas and the number of observations.
+
+```{r}
+table(simd2020$Council_area)
+```
+
+This shows the number of observations for all 32 council areas. Second, let’s use the count() function from the dplyr package. The count() function literally counts the number of observations and is commonly used when we are grouping the data by multiple observations. To use count(), we need to introduce a new coding concept and syntax. Tidyverse utilizes pipes which allows us to link multiple functions together in one block of code. While this is a more elegant coding approach, it also makes tidyverse easier to work with and allows us to manipulate multiple aspects of the data simultaneously.
+
+We start using pipes with the \|\> pipe operator. This is one of several pipe operators and is the most extensively used. We can think of \|\> as telling R to continue to and combine the next line of code with the previous line. Although though not strictly correct, I tend to think of \|\> as adding together lines of code. Let’s use the count() function to see the number of observations (which are datazones) per council area.
+
+```{r}
+simd2020 |> 
+  count(Council_area)
+```
+
+The output shows the first 10 council areas alphabetically and that there are an additional 22 council areas not shown. Depending on our goal, this might not be very useful. Instead, we often want sort variables by the most or least number of observations. We can do this by adding the option sort=TRUE into the count() function specification.
+
+```{r}
+simd2020 |> 
+  count(Council_area, sort = TRUE)
+```
+
+This shows that Glasgow City and City of Edinburgh have the most observations in the data; which makes sense since they are the two largest cities in Scotland.
+
+## Managing the Missing Values
+
+When reading in data and before we perform statistical analysis, we often need to deal with the missing values in some way. In the next classes, we will look at recoding variables, where we specify certain variable values as missing, but here we will look at dealing with missing values in the aggregate. While we could remove all observations with missing values for any variable in a dataset, this approach often removes more observations than is needed. An alternative approach is to remove observations with missing values only for the specific variables we are using. We can do this with the filter() function from the dplyr package. The filter() function acts just as you imagine - it filters the data based on a set of conditions. Below, we use the is.na() function in the filter() function to remove missing values from the variable Attendance. Since is.na() means ‘is missing’, we actually need to specify that we want to keep observations that are ‘not missing’. To do this, we include ! before is.na(); ! means ‘not’.
+
+```{r}
+simd2020 |> 
+  filter(!is.na(Attendance))
+```
+
+The output shows there are 6409 datazones that do not have missing values for Attendance. For completeness, let’s see what happens when we do not include !.
+
+```{r}
+simd2020 |> 
+  filter(is.na(Attendance))
+```
+
+This time the output shows there are 567 datazones that do have missing values for Attendance.
+
+## Subsetting the Data
+
+There are many reasons why we might want to subset data. Particularly when we download public data, we often want to get rid of irrelevant variables. Or, we may only want to work with a handful of variables instead of hundreds or thousands of variables. While we could use the common subset() function, subsetting in tidyverse is a terrific introduction to the data wrangling approach of tidyverse. We make use of the select() function from the dplyr package, where we specify the variables we want to subset. We will create a new object for each new tibble in order to take a closer look. First, we will subset the data to keep a single variable - Council_area.
+
+```{r}
+simd1 <- simd2020 |> 
+  select(Council_area)
+```
+
+To select an additional variable, we just include a comma and then the variable name.
+
+```{r}
+simd2 <- simd2020 |> 
+  select(Council_area, Total_population)
+```
+
+If we want to subset for a range of variables, we can include a colon.
+
+```{r}
+simd3 <- simd2020 |> 
+  select(Council_area:Income_rate)
+```
+
+Often, especially when we are just exploring the data, we want to drill down to specific observations or variable values. We can do this by using the filter() function with the select() function. We will first subset the data to only look at datazones in Glasgow City. Note, we need to specify == and not = in the code. Also, if we are using the select() function, the variable we are filtering needs to be included in the selected variables.
+
+```{r}
+simd4 <- simd2020 |> 
+  select(Intermediate_Zone:Income_rate) |> 
+  filter(Council_area=="Glasgow City")
+```
+
+We see in the Environment window that there are 746 datazones in Glasgow City. We can drill further down by adding new conditions. Below we ask for the Hillhead intermediate zone of Glasgow City; we can think of an intermediate zone as a neighborhood. We do this by including & Intermediate_Zone=="Hillhead", where, as you might guess, & is for ‘and’. Our filter() function specification tells R to only keep observations that are in Glasgow City and are in the Hillhead intermediate zone.
+
+```{r}
+simd5 <- simd2020 |> 
+  select(Intermediate_Zone:Income_rate) |> 
+  filter(Council_area=="Glasgow City" & Intermediate_Zone=="Hillhead")
+```
+
+::: callout-note
+👋 In this case, this latest subsets the data down to 7 datazones. (Although it might appear that specifying the Council_area is redundant, if we do not include it we will actually get datazones in a suburb of Glasgow.)
+:::
+
+Sometimes we want to subset data by a certain variable value. This might be a string (or character) or numeric value. First, let’s look at how to do this with a string/character value. Let’s subset the data to only include intermediate zones in cities’ downtowns - which is commonly referred to “city centre” in the UK. We will use the str_detect() function from the stringr package, wrapped by the filter() function, which literally detects the string value we specify; here, "Centre".
+
+```{r}
+simd6 <- simd2020 |> 
+  select(Intermediate_Zone:Income_rate) |> 
+  filter(str_detect(Intermediate_Zone, "Centre"))
+```
+
+Looking at simd6’s observations, we see this actually does a poor job - as a number of small town centres are included and Edinburgh is completely missing. Second, let’s subset the data by a specific numeric value. Here, we’ll do a simple version where we filter for datazones that have 25% or more of its residents classified as employment deprived (which includes the number of people receiving unemployment support, disability or incapacity support, etc.). We specify the variable (Employment_rate), the greater than or equals condition (\>=), and the numeric value (.25 for 25%).
+
+```{r}
+simd7 <- simd2020 |> 
+    select(Intermediate_Zone:Income_rate, Employment_rate) %>%
+    filter(Employment_rate >= .25)
+```
+
+We see this includes 293 datazones. Let’s further drill down to see how many of these datazones are in Glasgow by adding Council_area=="Glasgow City to the filter() function.
+
+```{r}
+simd8 <- simd2020 |> 
+    select(Intermediate_Zone:Income_rate, Employment_rate) %>%
+    filter(Employment_rate >= .25 & Council_area=="Glasgow City")
+```
+
+We see that Glasgow has 113 of the 293 datazones where 25% or more of its residents are employment deprived. (Glasgow is generally considered to be the most deprived city in the UK.)
+
+## Merging Different Dataset
+
+Tidyverse provides a number of ways to merge data through the use of join() functions from the dplyr package. The key, pun intended, of all the join() functions is that there needs to be a variable (a key) in each dataset we are merging that can individually identify the cases/observations. Without this key we are unable to merge the data. We specify the key using the by= option in the join() functions. We start by using the inner_join() function, which we use when the datasets all have the same number of observations; otherwise, all unmatched observations will be deleted. We are going to merge the 2020 SIMD data with a dataset that has the NHS Scotland health boards by datazone. We need to first read-in the health board data (titled scottish health boards by datazone.xlsx) using the read_xlsx() function.
+
+```{r}
+healthboard <- readxl::read_xlsx((here(dpath, "scottish health boards by datazone.xlsx")))
+glimpse(healthboard)
+```
+
+We see there are the same number of observations as the 2020 SIMD data. Because the keys have different variable names, we need to specify the keys for each dataset. We specify the key (Data_Zone) from our first dataset (simd2020) first and then the key (data_zone) from the dataset we are merging (healthboard) second.
+
+```{r}
+merge_simd1 <- simd2020 |> 
+  inner_join(healthboard, by=c("Data_Zone"="data_zone"))
+glimpse(merge_simd1)
+```
+
+Viewing the merged data, we see that we have just pasted 3 variables from the health boards data (intermediate_zone, council_area, and health_board) to the end of the SIMD data. The data_zone variable is removed since we told R that it had the same information as Data_Zone. If we had identical variable names in the merged datasets, then additional information as suffixes are automatically added to the duplicate variable names; with just two datasets, .x and .y will automatically be added to the duplicate variable names. Even though the SIMD data already has variables for the intermediate zone and council area, the variable names are not identical (because of the use of upper- and lower-case letters) and thus suffixes are not added. If we know there are duplicate variables, we can remove them when we do the merge by adding the select() function and specifying which variables to remove by including -c(). Doing this clearly demonstrates the benefit of using tidyverse - we are able to merge and subset the data in a single code chunk. Below we repeat the merge and remove Rows: 6,976 Columns: 39 \$ Data_Zone \$ Intermediate_Zone \$ Council_area intermediate_zone and council_area that were in the healthboard data.
+
+```{r}
+merged_simd1 <- simd2020 |> 
+      inner_join(healthboard, by=c("Data_Zone"="data_zone")) |> 
+      select(-c(intermediate_zone, council_area))
+glimpse(merged_simd1)
+```
+
+We now see that intermediate_zone and council_area have been removed. If we do not want to delete unmatched observations, there are several alternatives to the inner_join() function. Commonly, we want to preserve the observations in one main dataset when merging additional datasets. In this case, we can use the left_join() function, which keeps all the observations that appear in the first dataset (the left or X dataset) and deletes all the unmatched observations that appear in the second dataset (the right or Y dataset). Any observations in the first dataset that are not matched to the second dataset will have “NA” included for the variable values of the second dataset.
+
+```{r}
+merged_simd2 <- simd2020 |> 
+      left_join(healthboard, by=c("Data_Zone"="data_zone")) |> 
+      select(-c(intermediate_zone, council_area))
+glimpse(merged_simd2)
+```
+
+In this case, the merged_simd2 dataset is the same as the merged_simd1 dataset because they have the same observations. Other join functions include the right_join(), full_join(), semi-join(), and anti_join() functions. The right_join() function keeps all the observations in the second dataset (the right or Y dataset), the full_join() function keeps all the observations from both datasets, the semi_join() function keeps all the observations in the first dataset with a match in the second dataset, and the anti_join() function keeps all the observations in the first dataset without a match in the second dataset. Lastly, the join() functions allows us to merge more than two datasets at the same time (i.e., 3, 4, etc.) as long as each dataset has a key to link the observations. The join() functions provide an easy and effective way to merge different datasets in R. However, it is very easy to use the wrong join() function for what we want to accomplish. Therefore, it is important to closely examine our merged data before moving onto any analysis.
+
+## Pivoting the Dataset
+
+We can perform an array of different data pivoting using the tidyr package. If you have done table pivoting in Excel, then you are already familiar with the concept of data pivoting. Pivoting simply involves simultaneously transforming columns to rows and row to columns. We commonly pivot data for specific types of data visualizations and statistical analysis techniques. Let’s read-in a new dataset on the number of COVID-19 cases by NHS Scotland health board to demonstrate data pivoting. The file is called covid total by health board.xlsx and we’ll use the read_xlsx() function.
+
+```{r}
+covid <-readxl::read_xlsx(here(dpath, "covid total by health board.xlsx"))
+covid
+```
+
+This data is wide or what the tidyverse folks would call untidy data. To tidy the data, we are going to move each year’s covid total to a new row for health board. To do this, we will use the pivot_longer() function from the tidyr package, where we first specify the variables to pivot, then the name of a new variable with the original variable names (here, year), and finally the name of a new variable with the original variables’ values (here, cases).
+
+```{r}
+covid1 <- covid |> 
+    pivot_longer(c(`2020`,`2021`), names_to="year",
+                 values_to = "cases")
+covid1
+```
+
+We see that the new dataset covid1 now has 28 observations (14 observations X 2 variables). This data is now considered tidied. We can do the reverse with the pivot_wider() function from the tidyr package.
+
+```{r}
+covid2 <- covid1 |> 
+    pivot_wider(names_from="year", values_from="cases")
+covid2
+```
+
+## Saving the Data
+
+Now that we have done all this work of reading in data, dealing with missing values, and subsetting data, we probably want to save the work we have done. In truth, it is not critical to save everything we did, because by having a saved R script or R Markdown file of all the code we can easily recreate our work during a different R session. However, let’s consider several ways of saving our data. Saving data in R is slightly different from many statistical programs. Many programs like Stata allow you to simply save the data like you might in Word. In R, we generally use a write() function where we ‘write’ our data in a specific format, which creates a new data file that we save (usually in our working directory). As we saw with reading in different types of data formats, we can write to different types of data formats. We should also make sure that the data is correctly saved in the file type. For example, .csv files can struggle with text characters and, possibly obviously, commas in the data. If this occurs, we might want to save the data as a .xlsx file. Saving data to proprietary statistical program file types like Stata also can cause problems. For example, Stata does not allow certain characters to be used in variable names and thus may refuse to open the data. Let’s first write our dataset datacsv to a .csv file using the write_csv() function from the readr function. In the parentheses of write_csv(), we include the name of the dataset in R that we want to save (datacsv) and what we want the name of the dataset to be saved as (datacsv.csv).
+
+We simply need to look in our working directory to see whether the file saved (in my case it saved successfully). Now let’s write datacsv to a .xlsx file using the write_xlsx() function from the writexl package; which we need to load first.
+
+# Exercise 2: Recoding and Manuplating Variables
+
+We are going to examine a few common variable manipulation techniques using tidyverse. This includes renaming variables, creating new variables (e.g., dummy variables, collapsing categorical and numerical variables), labelling variable values, dealing with missing values, and numeric variable transformations. We will primarily use functions from the dplyr and forcats packages. While variable manipulation with tidyverse really is not any easier than using other approaches in R, one of the main benefits is that we can use and connect the various tidyverse functions for data visualization and analysis. More than anywhere else in R, variable manipulation is an area where there are a slew of different approaches that get the job done. Even within tidyverse, there are multiple variable manipulation functions that do the same job. Hence, it is impossible to cover all the possibilities here (or in anything less than an Infinite Jest-length book). The types of recoding and manipulating for your data needs will likely differ from what we do here. By covering some common variable manipulation techniques, this section should provide you a solid foundation.
+
+## Renaming
+
+We will start with the simplest (but often critical) task of renaming variables. We will use the rename() function from the dplyr package. The rename() function replaces the existing variable names with new ones. If you remember from the first workshop, the 2020 SIMD data used capital letters for a number of the variables. Generally, it is best practice to use lower-case variable names. If we want to rename a single variable, we can easily do so with the rename() function. In the function, we first specify the new variable name, then =, and then the old variable name. Let’s rename Data_Zone as data_zone.
+
+```{r}
+simd2020 |> 
+  rename(data_zone = Data_Zone)
+```
+
+We can rename additional variables by adding a comma and then other variables. Below, we rename Intermediate_Zone as intermediate_zone.
+
+```{r}
+simd2020 |> 
+  rename(data_zone = Data_Zone, intermediate_zone = Intermediate_Zone)
+```
+
+If we want to rename all the variables in the dataset at once, we can use the rename_with() function from the dplyr package. The rename_with() function requires specifying a function for renaming all the variables. Here, we use the tolower function, part of base R, to convert all the variable names to lower-case names.
+
+```{r}
+simd_lc <- simd2020 |> 
+  rename_with(tolower)
+names(simd_lc)
+```
+
+::: callout-note
+👋 Notice that we saved the renamed variables as a data object named simd_lc (for the lower-case version of simd2020).
+:::
+
+Another handy package is janitor, which has simple functions for examining and cleaning dirty data. janitor is a #tidyverse-oriented package. Specifically, it plays nicely with the \|\> pipe and is optimized for cleaning data brought in with the readr and readxl packages.
+
+The main janitor functions:
+
+-   perfectly format data.frame column names;
+
+-   create and format frequency tables of one, two, or three variables - think an improved table(); and
+
+-   provide other tools for cleaning and examining data.frames.
+
+The tabulate-and-report functions approximate popular features of SPSS and Microsoft Excel.
+
+Now, let's use janitor package to clean the names!
+
+```{r}
+# install.packages("janitor") 
+library(janitor)
+simd_j <- clean_names(simd2020)
+names(simd_j)
+```
+
+## Changing Variables’ Classifications
+
+As we discussed in the first workshop, each variable is classified (or specified) as some type (e.g., double/numeric, factor, character). There are situations when R reads in variables with the wrong variable type or we want to change the variable type to conduct a certain statistical analysis or data visualization. There are a number of different conversions we can make to variables, but the most common are: as.numeric(), as.double(), as.character(), and as.factor(). All of the as.() functions coerce a variable to be a certain type. Tidyverse uses as.numeric(), as.double(), as_character(), and as_factor(). There are subtle differences between as_factor and as.factor, but the main takeaway is that as_factor() allows greater control over variables’ value labels. It is good practice when converting the variable type to create a new variable. Let’s look at the variable council_area from the renamed simd_lc dataset. Remember, council_area is currently considered a character variable. R will throw a fit if we try to convert a character variable to a numeric or double variable. So, first, let’s convert it to a factor variable using the as.factor() function and name the new variable council_area_fac. For simplicity, we will create these variables using the base R approach.
+
+```{r}
+simd_lc$council_area_fac <- as.factor(simd_lc$council_area)
+class(simd_lc$council_area_fac)
+```
+
+We see that our new variable council_area_fac is now a factor variable. Next, let’s convert council_area_fac to a numeric variable using the as.numeric() function. We will name this new variable council_area_num.
+
+```{r}
+simd_lc$council_area_num <- as.numeric(simd_lc$council_area_fac)
+class(simd_lc$council_area_num)
+```
+
+We see that our new variable council_area_num is now a numeric variable. Let’s now convert council_area_fac to a double variable using the as.double() function. We will name this new variable council_area_dbl.
+
+```{r}
+simd_lc$council_area_dbl <- as.numeric(simd_lc$council_area_fac)
+class(simd_lc$council_area_dbl)
+```
+
+::: callout-note
+👋 Although we used the as.double() function, the output here says that council_area_dbl is a numeric variable. Huh? Again, numeric and double variables are essentially the same thing. If we look at how council_area_dbl is classified by tidyverse, we see that it is as a double (<dbl>).
+:::
+
+One important thing to note is that the as.numeric() and as.double() functions will strip out any value labels in the original variable. This is another reason we create a new variable when we perform any variable type conversions.
+
+## Changing Variables with the Mutate() Function
+
+The core function in dplyr (and tidyverse) for recoding variables is the mutate() function. For a quick look at mutate(), we will simply reclassify urban as a factor. For mutate(), we name the new variable first, then =, and then the old variable. We do not have to create a new variable, but it is good practice when recoding - so, if/when we screw up, we do not need to re-read-in the data, etc.
+
+Let’s first take a look at urban.
+
+```{r}
+simd_lc |> 
+  count(urban)
+```
+
+We see that urban is classified as double. Now let’s reclassify urban as a factor variable using the as_factor() function and create a new variable called urban_fct.
+
+```{r}
+simd_lc <- simd_lc |> 
+  mutate(urban_fct=as_factor(urban))
+  
+simd_lc |> 
+  count(urban_fct)
+```
+
+In the count() output, we see that urban_fct is now a factor variable instead of a double variable.
+
+## Removing Characters in Variables
+
+Sometimes we have datasets that include non-numeric values (e.g., \$ or \@), which we need to remove in order to perform statistical analysis. We may also want to change the characters and symbols that were used by the original dataset creators. We could do this by-hand in, for example, an Excel file, but it could take forever and it reduces replicability. As an example of how to remove certain characters, let’s look at a Federal Bureau of Investigation dataset on the number, type, and location of hate crimes in the U.S. during 2020. The dataset is saved as an Excel file named 2020_HateCrime_Location.xlsx. To demonstrate ‘real-world’ data cleaning in-action, I have only done minimal prior cleaning of this file. The first problem we will have reading in the file is that the first 5 rows are header information about the data table. We can easily deal with this problem by including the skip=5 option in the read_xlsx() function - this tells R to skip the first 5 rows when reading in the data.
+
+```{r}
+library(readxl)
+hcrime <- read_xlsx(here(dpath, "2020_HateCrime_Location.xlsx"), skip = 5)
+glimpse(hcrime)
+```
+
+We immediately see another problem - several variables have \r\n in their names, which indicates a ‘new line’ in a Microsoft Office document. We could remove these characters after we read-in the data, but an easier solution is to use the option .name_repair = "universal" in the read_xlsx() function.
+
+```{r}
+hcrime <- read_xlsx(here(dpath, "2020_HateCrime_Location.xlsx"), skip = 5, .name_repair = "universal")
+glimpse(hcrime)
+```
+
+Following the read_xlsx() function, we see that the problematic names were automatically repaired by replacing \r\n and / with .. and .... Although the variable names will now work for tidyverse functions, they are pretty ugly. So, let’s change the names of the variables with .. and ... using the rename() function.
+
+Before we rename the variables, let’s convert all the letters to lower-case using the rename_with() function. Let’s also create a new tibble called hcrime1.
+
+```{r}
+hcrime1 <- hcrime |> 
+            rename_with(tolower) |> 
+            rename(total_incidents = total..incidents,
+                   race_ethnicity_ancestry = race...ethnicity...ancestry,
+                   sexual_orientation = sexual..orientation,
+                   gender_identity = gender..identity,
+                   multiple_bias_incidents = multiple...bias..incidents)
+glimpse(hcrime1)
+```
+
+How about using Janitor instead!
+
+```{r}
+hcrime2 <- clean_names(hcrime)
+
+glimpse(hcrime2)
+  
+```
+
+::: callout-note
+👏 Much more easier, isn't it?
+:::
+
+That looks much better. Although the / in the values for location are not problematic, let’s replace them with , for demonstra- tion purposes. To do so, we use the str_replace_all() function from the stringr package. In the str_replace_all() function, we specify the variable we are manipulating (location), what we want to replace (/), and what we want to replace it with (,). In order to remove all instances of / in the values, we need to use the str_replace_all() function instead of the str_replace(), which will only remove the first occurrence. Let’s wrap the mutate() function around the str_replace_all() function and create a new variable called location1 in case we mess up. Note that we include a space in ", " to make the values print better.
+
+```{r}
+hcrime1 <- hcrime1 |> 
+  mutate(location1 = str_replace(location,"/", ", "))
+
+glimpse(hcrime1)
+```
+
+We see that the values in the new variable location1 include , instead of /. Now that we know the above code works, we could re-do all of it a single code chunk. Although not necessary here, it is good practice for data analysis replication files, course assignments, beauty purposes, etc. Let’s create a new tibble named hcrime_clean and overwrite the location variable.
+
+```{r}
+hcrime_clean <- hcrime |> 
+            rename_with(tolower) |> 
+            rename(total_incidents = total..incidents,
+                   race_ethnicity_ancestry = race...ethnicity...ancestry,
+                   sexual_orientation = sexual..orientation,
+                   gender_identity = gender..identity,
+                   multiple_bias_incidents = multiple...bias..incidents) |> 
+  mutate(location = str_replace_all(location,"/",", "))
+glimpse(hcrime_clean)
+```
+
+## Labeling and Re-Labeling
+
+We often need to label and re-label variable values; especially, after we read-in data for the first time. Using the recode() function from the dplyr package, let’s label the urban_fct variable from the simd_lc data. Above we saw that urban_fct is currently labelled as 0 and 1. A reasonable guess is that 1= ‘urban’, but let’s add labels to these values so it is clearer. In the recode() function, we first specify the variable we are recoding and then the labels we are applying to the values. For the labels, we first specify the old value, =, then the new label. One quirk for relabelling numbers is that we need to put tick marks around the numbers.
+
+```{r}
+simd_lc <- simd_lc |> 
+  mutate(urban_fct = recode(urban_fct, `1`="urban", `0`="rural"))
+
+simd_lc |> 
+  count(urban_fct)
+```
+
+That looks better. If we wanted to change existing labels using the recode() function, we just specify the existing labels in quotes followed by the new labels in quotes. Here, let’s change ‘urban’ to ‘city’ and ‘rural’ to ‘boonies’, and save this new version as urban_fct1.
+
+```{r}
+simd_lc <- simd_lc |> 
+          mutate(urban_fct1 = recode(urban_fct, "urban"="city", "rural"="boonies"))
+simd_lc |> 
+    count(urban_fct1)
+```
+
+## Re-Arranging Values
+
+We often want to re-arrange a variable’s values. This is especially the case when we have a variable that is substantively ordinal, but is currently coded as unordered. If we put the unordered version in a regression, R will treat it as an ordered variable instead of a nominal variable - R is not that smart (yet). Note, R will treat any factor variable as nominal and will automatically ‘dummy it out’ in a regression. Let’s use data from a 2019 survey about perceptions of voter fraud in England. The name of the data file is VF England.csv and we will read it in using the read_csv() function.
+
+```{r}
+vf_england <- read_csv(here(dpath, "VF England.csv"))
+```
+
+Let’s look at the variable vfproblem from the vf_england data using the count() function.
+
+```{r}
+vf_england |> 
+  count(vfproblem)
+```
+
+We see that the agree/disagree values are ordered alphabetically, which is what R does automatically when reading in character and factor variables. Let’s re-arrange the values of vfproblem to make them ordered from ‘Strongly disagree’ to ‘Strongly agree’. We do this using the factor() function from the forcats package and using the levels= option to order the labels. Let’s create a new variable titled vfproblem1 by wrapping everything with the mutate() function.
+
+```{r}
+vf_england <- vf_england |> 
+  mutate(vfproblem1 = factor(vfproblem,
+                             levels= c("Strongly disagree","Disagree",
+                     "Slightly disagree","Neither agree nor disagree",
+                     "Slightly agree","Agree","Strongly agree")))
+vf_england |> 
+  count(vfproblem1)
+```
+
+This is nice and ordered. Further, with the re-arranged value labels, vfproblem1 is now an ordinal variable. If we have a number of variables where we need to re-arrange the values, we could set the levels prior to re-arranging the values. Although we still need to type out the levels (once), we might do this to save time and space if we re-use the same levels multiple times in our recoding. To do this, we just create an object that contains our levels. Let’s name this object agree_levels.
+
+```{r}
+agree_levels <- c("Strongly disagree","Disagree",
+                 "Slightly disagree","Neither agree nor disagree",
+                 "Slightly agree","Agree","Strongly agree")
+```
+
+Now, instead of writing out the levels in our factor() function, we just specify levels=agree_levels. Let’s also create a new variable titled vfproblem2
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(vfproblem2 = factor(vfproblem,
+              levels=agree_levels))
+vf_england |> 
+  count(vfproblem2)
+```
+
+Sometimes we have variables where we want to flip the values so that the higher value is more intuitive for interpretations; for example, in a regression analysis. Let’s do this for vfproblems2 using the fct_rev() function from the forcats package. The fct_rev() automatically and symmetrically reverses the values for a factor variable.
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(vfproblem3 = fct_rev(vfproblem2))
+vf_england |> 
+  count(vfproblem3)
+```
+
+::: callout-note
+👏 That was super easy! Wasn't that?
+:::
+
+## Collapsing Variables
+
+There are times when we take a variable with many values and recode it so that it only has a few categories. This is commonly known as collapsing variables. As a general rule, we prefer to have variables with as many values as possible and so collapsing a variable can be a bad idea. However, we typically collapse variables that have many values when we want to present the variable in tabular form. It is easier to read and understand a variable with 5 values than a variable with 50 values in a table.
+
+### Collapsing Categorical Variables
+
+Let’s first look at how to collapse categorical variables. To do this, we will use the fct_collapse() function from the forcats package. The nice thing with fct_collapse() is that we can combine multiple categories within a single line. Let’s use the vfproblem1 variable and collapse all the ‘disagree’ categories into one category and all the ‘agree’ categories into one category; and we leave the ‘neither’ category alone. We will create a new variable called vfproblem4.
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(vfproblem4 = fct_collapse(vfproblem1,
+                                       "Disagree" = c("Strongly disagree",
+                                                      "Disagree",
+                                                      "Slightly disagree"),
+                                       "Agree" = c("Strongly agree",
+                                                   "Agree",
+                                                   "Slightly agree")))
+vf_england %>%
+  count(vfproblem4)
+```
+
+We see that vfproblem4 has 3 categories instead of the original 7 categories.
+
+### Collapsing Numeric Variables
+
+Although it is best practice to not collapse numeric variables (double variables in tidyverse terminology) when performing analysis, we commonly do it for tabular data presentations and certain data visualizations. Below, we will use the cut_interval() function from, bizarrely, the ggplot2 package to collapse the variable age from vf_england into four categories. The cut_interval() function automatically creates equal sized categories based on the requested number of categories - below, we ask for 3 categories by including the option n=3.
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(age_cat = cut_interval(age, n=3))
+
+vf_england |> 
+  count(age_cat)
+```
+
+We can add labels to the categories using the labels= option in the cut_interval() function. Let’s label our categories as ‘Young’, ‘Middle Age’, and ‘Old’, and create a new variable called age_cat1.
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(age_cat1 = cut_interval(age, n=3,
+                                     labels= c("Young", "Middle Age", "Old")))
+vf_england |> 
+  count(age_cat1)
+```
+
+Although the cut_interval() function automatically collapses the data with equal sized categories, sometimes we want to manually control the breaks and category sizes. We can manually set the breaks and labels using the cut() function which is part of base R, but instead let’s use several tidyverse functions to do it and set the age categories as 18 to 40, 41 to 65, and 66 to 88. We’ll use the case_when() function, which is a vectorized if function allowing multiple conditions. In the case_when() function, we need to specify the variable we are recoding (age), then the %in% operator, the value range, \~, and finally the label. The %in% operator is used to identify whether an element is in a vector or data frame. For example, the line age %in% 18:40 \~ "Young" means, “if age is 18-40, then set to the label ‘Young’ ”. We do this for each one of the new categories. We’ll create a new variable called age_cat2 and wrap the mutate() function around all of it.
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(age_cat2 = case_when(
+        age %in% 18:40 ~ "Young",
+        age %in% 41:65 ~ "Middle Age",
+        age %in% 66:88 ~ "Old"
+))
+vf_england |> 
+  count(age_cat2)
+```
+
+The coding worked, but we see that R has ordered the labels alphabetically. Let’s fix this by reordering the labels using the factor() function. To demonstrate the radness of tidyverse, let’s add the reordering code to the case_when() code as a new mutate() line.
+
+```{r}
+vf_england <- vf_england |> 
+      mutate(age_cat2 = case_when(
+        age %in% 18:40 ~ "Young",
+        age %in% 41:65 ~ "Middle Age",
+        age %in% 66:88 ~ "Old"
+      )) |> 
+      mutate(age_cat2 = factor(age_cat2,
+              levels=c("Young","Middle Age","Old")))
+vf_england |> 
+  count(age_cat2)
+```
+
+## Dummying Nominal Variables
+
+As quantitative social scientists, we often have variables that are nominal, but have multiple categories; that is, not just binary variables. Many statistical techniques assume that variables with multiple values have an order; regardless of whether they are ordinal, interval, or ratio. This is particularly the case with linear regression and other types of regression models. Computers and statistical programs are smart, but they do not catch every dumb thing we do. If we include a nominal variable with multiple categories into a method where the assumption is that the variable has order, R is not going to catch it and will provide results assuming the variable is ordered. For example, if we included a race variable with multiple categories into a linear regression, our interpretation of the coefficient would start with “as we increase on race...”. Obviously, this makes no sense. We will create a sequence of dummy variables using the variable pid, short for ‘partisan identification’, from the vf_england data. Before we do that, let’s take a look at pid.
+
+```{r}
+vf_england |> 
+  count(pid)
+```
+
+We see there are 3 categories (‘Conservative’, ‘Other’, and ‘UKIP Brexit’) and that pid is classified as a character variable. Let’s first create a dummy variable for Conservative Party identifiers. We do this using the fct_collapse() function. We also want to change pid to a factor variable and then use the filter() function to remove the NAs. Since pipes work sequentially, we need to first change pid to a factor and then recode the variable. If possible it is also good practice to name the dummy variable whatever the higher value equals. We name this dummy variable conservative. Finally, let’s create a new tibble named vf_england1.
+
+```{r}
+vf_england1 <- vf_england |> 
+  mutate(pid1 = as_factor(pid)) |> 
+  mutate(conservative = fct_collapse(pid1,
+                                     "Conservative"="Conservative",
+                                     "Other"=c("UKIP Brexit","Other")))
+vf_england1 %>%
+  count(conservative)
+  
+```
+
+This dummy variable looks good. But, we see that the values 1 and 2 are attached and not the standard dummy variable values of 0 and 1. Is that problem? Usually it is not a problem as long as the values are just separated by one unit. For regression modelling, a dummy variable that has values of 1 and 2 (instead of 0 and 1) simply shifts the constant/intercept, but the variable’s coefficient will be the same. Hence, this only matters if we are using the constant/intercept for interpretation purposes. Now, let’s create a dummy variable for ‘UKIP Brexit’, which is a combined category of UKIP and Brexit Party identifiers. Since we created the pid1 variable previously, we do not need to include the first mutate() and the filter() lines again when using the vf_england1 data. We name this dummy variable ukip_brexit.
+
+```{r}
+vf_england1 <- vf_england1 |> 
+      mutate(ukip_brexit = fct_collapse(pid1,
+                    "Other"=c("Conservative","Other"),
+                    "UKIP Brexit"="UKIP Brexit"))
+vf_england1 |> 
+  count(ukip_brexit)
+```
+
+We have now created two dummy variables from the pid variable. However, for some reason, the UKIP Brexit category is the lower category, while we want it to be the higher category. Let’s fix this by adding the fct_rev() function to the code above.
+
+```{r}
+vf_england1 <- vf_england1 |> 
+      mutate(ukip_brexit = fct_collapse(pid1,
+                    "Other"=c("Conservative","Other"),
+                    "UKIP Brexit"="UKIP Brexit")) |> 
+      mutate(ukip_brexit = fct_rev(ukip_brexit))
+vf_england1 |> 
+  count(ukip_brexit)
+```
+
+Now it looks correct. In fact, we have done something known as dummying out a variable. This is where we take all of the values from a multi-category nominal variable and make them dummy variables. We need to specify that one of the original values is 0 (or, 1 in this case) in all of the dummy variables (which is the Other respondents without Conservative and UKIP/Brexit identifiers). If we do not and we use all of the dummy variables at the same time, we have what is known as collinearity among predictors, which means that the dummy variables explain one another. In this case, R, and other statistical programs, will not be able to perform the analysis. Hence, the one value that is kept out is considered the base or reference category. When we want to make dummy variables of all the values, we create J − 1 dummy variables, where J is the number of categories or values of the original nominal variable. A common question is which category do we decide to leave out as the reference category. There are a few different ways to decide this but the two most common are to use the category with most observations as the reference or use a category that we have a substantive interest in as the reference. For example, when dummying out race, we may decide that we want all the categories to be compared to white respondents and so we keep whites as the reference group. In some analyses in R, we can also use the as_factor() function to automatically dummy out a nominal variable. For example, instead of creating the 2 dummy variables above, we could use as_factor(pid) within another R function. This is particularly useful in regression analysis where we want to include all of the values of a nominal variable.

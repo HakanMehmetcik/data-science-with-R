@@ -1,0 +1,6 @@
+"0","# Let's recall IQ score data we have cretaed"
+"0",""
+"0","# Point Estimation"
+"0","mean_est <- mean(IQ) # Mean IQ score"
+"2","Error: object 'IQ' not found
+"
