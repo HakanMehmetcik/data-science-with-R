@@ -1,0 +1,18 @@
+Week,Date,Type,Topic,Readings
+1,"February 17, 2025",📒 Lesson,"Introduction to R, RStudio, and R Markdown","MDSR Appendix A-B-C, MDSR 1, R4DS 1"
+2,"February 24, 2025",📒 Lesson,Data Visualization with ggplot,"MDSR 2, R4DS 3"
+3,"March 03, 2025",📒 Lesson,Data Visualization with ggplot2,"MDSR 3, R4DS 3"
+4,"March 10, 2025",📒 Lesson,Data Frames and Data Manipulation,"MDSR 4-5, R4DS 5-8"
+5,"March 17, 2025",📒 Lesson,Data Summarization and Pipes,"MDSR 6-7, R4DS 9-16"
+6,"March 24, 2025",📒 Lesson,"Data Communication, Data Import and Workflows","MDSR Appendix D, R4DS 26"
+7,"April 07, 2025",📒 Lesson,"Data Communication, Data Import and Workflows","MDSR Appendix D, R4DS 267"
+8,"April 21, 2025",📒 Lesson,"Linear Regression, Inference and Modeling","MDSR Appendix E, R4DS 24"
+9,"April 28, 2025",📒 Lesson,"Descriptive Statistics, Inference and Modeling","MDSR 9-10, R4DS 22-23"
+10,"May 05, 2025",🔍 Exam,,
+11,"May 12, 2025",📒 Lesson,"Machine Learning, Modeling","MDSR 10-11, R4DS 25"
+12,"May 19, 2025",📒 Lesson,"Modeling, Text as Data","MDSR 19, R4DS 14"
+13,"May 26, 2025",📒 Lesson,Project Sample,Hands-out
+14,"June 02, 2025",📒 Lesson,Project Sample,Hands-out
+15,"June 16, 2025",📒 Lesson,Project Sample,Hands-out
+16,"June 23, 2025",📒 Lesson,Review,
+17,"June 30, 2025",🔍 Exam,,
