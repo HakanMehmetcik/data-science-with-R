@@ -180,7 +180,9 @@ Just as for data types, we can easily extend these basic shapes into more comple
 
 -   non-rectangular data, e.g., a list of sentences, what someone did last summer
 
-For more see: **Introduction to Data Science** <https://bookdown.org/hneth/i2ds/intro.html>
+::: callout-note
+👋 The contents are mostly based on **Introduction to Data Science** <https://bookdown.org/hneth/i2ds/intro.html>
+:::
 
 ## An introduction to R and RStudio:
 
@@ -195,6 +197,12 @@ RStudio is an open-source integrated development environment (IDE) for R created
 :::
 
 ### R Basics
+
+Mastering R (or any other programming language) essentially consists in solving two inter-related tasks:
+
+1.  Defining various types of data as *objects*!
+
+2.  Manipulating these objects by using *functions*!
 
 #### Using R as a Calculator
 
@@ -220,13 +228,60 @@ You can use R as a calculator to perform basic arithmetic operations. Just type 
 
 ```
 
+Some additional computing numbers:
+
+```{r}
+x <- 5
+y <- 2
+
++ x      # keeping sign 
+#> [1] 5
+- y      # reversing sign
+#> [1] -2
+x + y    # addition
+#> [1] 7
+x - y    # subtraction
+#> [1] 3
+x * y    # multiplication
+#> [1] 10
+x / y    # division
+#> [1] 2.5
+x ^ y    # exponentiation
+#> [1] 25
+x %/% y  # integer division
+#> [1] 2
+x %% y   # remainder of integer division (x mod y)
+#> [1] 1
+```
+
+::: callout-note
+💡 When an arithmetic expression contains more than one operator, the issue of *operator precedence* arises. When combining different operators, R uses the precedence rules of the so-called “BEDMAS” order:
+
+-   **B**rackets `()`,
+
+-   **E**xponents `^`,
+
+-   **D**ivision `/` and **M**ultiplication `*`,
+
+-   **A**ddition `+` and **S**ubtraction `-`
+:::
+
 #### Creating New Objects
 
-In R, you can create and store values in objects. This is done using the assignment operator `<-`. You can name the object on the left and assign a value or expression to it on the right.
+In simple term, in R, you can create and store values as objects and the main type of object used in R for representing data is a *vector*. Vectors come in different data types and shapes and have some special properties that we need to know in order to use them in a productive fashion.
+
+Defining an object in R is done using the assignment operator `<-`. You can name the object on the left and assign a value or expression to it on the right in the following format:
+
+`obj_name <- value`
 
 ```{r}
 
 # Creating objects
+
+lg <- TRUE
+n1 <- 1
+n2 <- 2L
+cr <- "hi"
 
 x <- 3 * 4
 
@@ -238,12 +293,69 @@ a <- x * y - z
 
 ```
 
-#### Functions
-
-R has a vast collection of built-in functions, each with specific purposes. Functions are called by their names followed by arguments in parentheses.
+To determine the *type* of these objects, we can evaluate the [`typeof()`](https://rdrr.io/r/base/typeof.html) function on each of them:
 
 ```{r}
+typeof(lg)
+#> [1] "logical"
+typeof(n1)
+#> [1] "double"
+typeof(n2)
+#> [1] "integer"
+typeof(cr)
+#> [1] "character"
+```
 
+::: callout-note
+⚠️ **Naming objects**
+
+**Naming objects (both data objects and functions) is an art in itself.** A good general recommendation is to always aim for consistency and clarity. This may sound trivial, but if you ever tried to understand someone else’s code — including your own from a while ago — it is astonishing how hard it actually is.
+
+Here are some generic recommendations (some of which may be personal preferences):
+
+-   Always aim for short but clear and descriptive names:
+
+    -   data objects can be abstract (e.g., `abc`, `t_1`, `v_output`) or short words or abbreviations (e.g., `data`, `cur_df`),
+
+    -   functions should be verbs (like [`print()`](https://rdrr.io/r/base/print.html)) or composita (e.g., `plot_bar()`, `write_data()`).
+
+<!-- -->
+
+-   Honor existing conventions (e.g., using `v` for vectors, `i` and `j` for indices, `x` and `y` for coordinates, `n` or `N` for sample or population sizes, …).
+
+-   Create new conventions when this promotes consistency (e.g., giving objects that belong together similar names, or calling all functions that plot something with `plot_...()`, that compute something with `comp_...()`, etc.).
+
+-   Use only lowercase letters and numbers for names (as they are easy to type — and absolutely avoid all special characters, as they may not exist or look very different on other people’s computers),
+
+-   Use `snake_case` for combined names, rather than `camelCase`, and — perhaps most importantly —
+
+-   Break any of those rules if there are good (i.e., justifiable) reasons for this.
+:::
+
+#### Functions
+
+Objects come in different data “types” (e.g., character, numeric, logical) and “shapes” (short or long), and — like any other data object — are manipulated by suitable “functions”. R has a vast collection of built-in functions, each with specific purposes. Functions are called by their names followed by arguments in parentheses.
+
+> *To understand computations in R, two slogans are helpful:\
+> - Everything that exists is **an object**.\
+> - Everything that happens is **a function** call.*
+>
+> John Chambers
+
+To do something with these objects, we can apply other functions to them:
+
+```{r}
+!lg        # negate a logical value
+#> [1] FALSE
+n1         # print an object's current value
+#> [1] 1
+n1 + n2    # add 2 numeric objects
+#> [1] 3
+nchar(cr)  # number of characters
+#> [1] 2
+```
+
+```{r}
 # Using built-in functions
 
 seq(from = 10, to = 68, by = 3) # Sequence of numbers
@@ -276,6 +388,33 @@ ifnegative(-5)
 
 ifnegative(2)
 
+```
+
+Doing statistics in R essentially means to apply statistical functions to data objects. The following basic functions examine and describe a numeric data object `nums`:
+
+```{r}
+# Define a numeric vector:
+nums <- c(-10, 0, 2, 4, 6)
+
+# basic functions:
+length(nums) # nr. of elements
+#> [1] 5
+min(nums)    # minimum 
+#> [1] -10
+max(nums)    # maximum
+#> [1] 6
+range(nums)  # min - max
+#> [1] -10   6
+
+# aggregation functions:
+sum(nums)   # sum
+#> [1] 2
+mean(nums)  # mean
+#> [1] 0.4
+var(nums)   # variance
+#> [1] 38.8
+sd(nums)    # standard deviation
+#> [1] 6.228965
 ```
 
 #### Operators
@@ -356,9 +495,17 @@ a %in% b # Check if elements in 'a' belong to 'b'
 
 ### Data Types in R
 
-R supports different data types, including:
+For any data object, we distinguish between its *shape* and its *type*. The *shape* of an object mostly depends on its *structure*. Overall, the following data *types* are the one you probably encounter!
 
-\- **Numeric**: These are numeric values (e.g., 3.14, 42).
+1.  numbers (of type *integer* or *double*)
+
+2.  text or string data (of type *character*)
+
+3.  logical values (aka. Boolean values, of type *logical*)
+
+4.  dates and times (with various data types)
+
+**Numeric**: These are numeric values (e.g., 3.14, 42).
 
 ```{r}
 
@@ -381,6 +528,79 @@ z <- c(TRUE, FALSE, TRUE, FALSE, TRUE)
 
 ```
 
+**Date:** These are date values in specific format. Dates and times are more complicated data types — not because they are complicated *per se*, but because their definition and interpretation needs to account for a lot of context and conventions, plus some irregularities. At this early point in our R careers, we only need to know that such data types exist. Two particular functions allow to illustrate them and are quite useful, as they provide the current date and time:
+
+```{r}
+Sys.Date()
+#> [1] "2022-09-07"
+Sys.time()
+#> [1] "2022-09-07 20:01:34 CEST"
+```
+
+To check the *type* of a data object, two elementary functions that can be applied to any R object are [`typeof()`](https://rdrr.io/r/base/typeof.html) and [`mode()`](https://rdrr.io/r/base/mode.html):
+
+```{r}
+typeof(TRUE)
+#> [1] "logical"
+typeof(10L)
+#> [1] "integer"
+typeof(10)
+#> [1] "double"
+typeof("oops")
+#> [1] "character"
+
+mode(TRUE)
+#> [1] "logical"
+mode(10L)
+#> [1] "numeric"
+mode(10)
+#> [1] "numeric"
+mode("oops")
+#> [1] "character"
+```
+
+#### **Missing values**
+
+The final concept considered here is not a type of data, but a type of *value*. What happens when we do not know the value of a variable? In R, a lacking or missing value is represented by `NA`, which stands for *not available*, *not applicable*, or *missing value*:
+
+```{r}
+# Assign a missing value:
+ms <- NA
+ms
+#> [1] NA
+
+# Data type?
+typeof(ms)
+#> [1] "logical"
+mode(ms)
+#> [1] "logical"
+```
+
+As missing values are quite common in real-world data, we need to know how to deal with them. The function [`is.na()`](https://rdrr.io/r/base/NA.html) allows us to test for a missing value:
+
+```{r}
+is.na(12)
+#> [1] FALSE
+is.na(NA)
+#> [1] TRUE
+```
+
+In R, `NA` values are typically “addictive” in the sense of creating more `NA` values when applying functions to them:
+
+```{r}
+NA + 1
+#> [1] NA
+sum(1, 2, NA, 4)
+#> [1] NA
+```
+
+but many functions have ways of instructing R to ignore missing values. For instance, many numeric functions accept a logical argument `na.rm` that remove any `NA` values:
+
+```{r}
+sum(1, 2, NA, 4, na.rm = TRUE)
+#> [1] 7
+```
+
 ### Data Structures
 
 |     | Homogeneous   | Heterogeneous |
@@ -400,6 +620,18 @@ z <- c(TRUE, FALSE, TRUE, FALSE, TRUE)
 # Create an atomic vector
 
 var1 <- c(1, 2.5, 4, 6)
+```
+
+We have already seen that using the assignment operator `<-` creates new data objects and that the [`c()`](https://rdrr.io/r/base/c.html) function combines (or concatenates) objects into vectors. When the objects being combined are already stored as vectors, we are actually creating longer vectors out of shorter ones:
+
+```{r}
+# Combining scalar objects and vectors (into longer vectors): 
+v1 <- 1          # same as v1 <- c(1)
+v2 <- c(2, 3)
+
+v3 <- c(v1, v2, 4)  # but the result is only 1 vector, not 2 or 3: 
+v3
+#> [1] 1 2 3 4
 ```
 
 #### Lists
