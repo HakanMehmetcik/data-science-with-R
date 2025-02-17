@@ -1,5 +1,4 @@
 ---
-title: "syllabus"
 format: pdf
 editor: visual
 ---
@@ -50,6 +49,8 @@ This course is designed for students who want to learn the fundamentals of R and
 
 By the end of the course, students will have a strong foundation in **R programming** and its **applications in data science**, enabling them to analyze and visualize real-world datasets effectively.
 
+------------------------------------------------------------------------
+
 ### **Course Learning Outcomes**
 
 By the end of this course, students will be able to:
@@ -82,6 +83,8 @@ These skills will provide students with a strong foundation in **data analysis a
 -   [R Programming wikibook](http://en.wikibooks.org/wiki/R_Programming)
 -   [Using R for Data Analysis and Graphics](http://cran.r-project.org/doc/contrib/usingR.pdf) by J. H. Maindonald
 -   [The R Inferno](http://www.burns-stat.com/pages/Tutor/R_inferno.pdf) by Patrick Burns (advanced)
+
+------------------------------------------------------------------------
 
 ### **Required Materials for the Course**
 
@@ -254,10 +257,10 @@ library(tidyverse)
 library(readr)
 library(knitr)
 # Load course schedule CSV
-course_schedule <- read_csv("~/Desktop/mac_projects 2/data-science-with-R/Course_Schedule.csv")
+course_schedule <- read_csv("~/Desktop/mac_projects 2/data-science-with-R/syllabus/Course_Schedule.csv")
 ```
 
-```{r}
+```{r display-schedule, echo=FALSE, message=FALSE, warning=FALSE}
 # Display the schedule as a formatted table
 kable(course_schedule)
 ```
