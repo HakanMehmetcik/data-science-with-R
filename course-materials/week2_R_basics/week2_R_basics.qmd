@@ -38,6 +38,14 @@ Mastering R (or any other programming language) essentially consists in solving
 
 2.  Manipulating these objects by using *functions*!
 
+Here, we introduce both of these tasks. Later, we will see that analyzing data often involves creating and manipulating additional data structures and that the activity of *programming* usually involves creating our own processes and functions.
+
+> *To understand computations in R, two slogans are helpful:\
+> - Everything that exists is **an object.**\
+> - Everything that happens is **a function** call.*
+>
+> John Chambers
+
 #### Using R as a Calculator
 
 You can use R as a calculator to perform basic arithmetic operations. Just type in your calculations, and R will provide the results.
@@ -100,7 +108,7 @@ x %% y   # remainder of integer division (x mod y)
 
 #### Creating New Objects
 
-In simple term, in R, you can create and store values as objects and the main type of object used in R for representing data is a *vector*. Vectors come in different data types and shapes and have some special properties that we need to know in order to use them in a productive fashion.
+In simple term, in R, you can create and store values **as objects** and the main type of object used in R for representing data is **a *vector***. Vectors come in different data types and shapes and have some special properties that we need to know in order to use them in a productive fashion.
 
 Defining an object in R is done using the assignment operator `<-`. You can name the object on the left and assign a value or expression to it on the right in the following format:
 
@@ -150,8 +158,6 @@ Here are some generic recommendations (some of which may be personal preferences
 
     -   functions should be verbs (like [`print()`](https://rdrr.io/r/base/print.html)) or composita (e.g., `plot_bar()`, `write_data()`).
 
-<!-- -->
-
 -   Honor existing conventions (e.g., using `v` for vectors, `i` and `j` for indices, `x` and `y` for coordinates, `n` or `N` for sample or population sizes, …).
 
 -   Create new conventions when this promotes consistency (e.g., giving objects that belong together similar names, or calling all functions that plot something with `plot_...()`, that compute something with `comp_...()`, etc.).
@@ -165,12 +171,6 @@ Here are some generic recommendations (some of which may be personal preferences
 #### Functions
 
 Objects come in different data “types” (e.g., character, numeric, logical) and “shapes” (short or long), and — like any other data object — are manipulated by suitable “functions”. R has a vast collection of built-in functions, each with specific purposes. Functions are called by their names followed by arguments in parentheses.
-
-> *To understand computations in R, two slogans are helpful:\
-> - Everything that exists is **an object**.\
-> - Everything that happens is **a function** call.*
->
-> John Chambers
 
 To do something with these objects, we can apply other functions to them:
 
@@ -585,7 +585,7 @@ First you must **import** your data into R. This typically means that you take d
 
 Once you’ve imported your data, it is a good idea to **tidy** it. Tidying your data means storing it in a consistent form that matches the semantics of the dataset with the way it is stored. In brief, when your data is tidy, each column is a variable, and each row is an observation. Tidy data is important because the consistent structure lets you focus your struggle on questions about the data, not fighting to get the data into the right form for different functions.
 
-![](images/data-science.png)
+![](images/data-science.png){width="649"}
 
 Once you have tidy data, a common first step is to **transform** it. Transformation includes narrowing in on observations of interest (like all people in one city, or all data from the last year), creating new variables that are functions of existing variables (like computing speed from distance and time), and calculating a set of summary statistics (like counts or means). Together, tidying and transforming are called **wrangling**, because getting your data in a form that’s natural to work with often feels like a fight!
 
