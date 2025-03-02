@@ -27,7 +27,9 @@ dpath <- "data"
 
 # Data visualization
 
-\| “The simple graph has brought more information to the data analyst’s mind than any other device.” — John Tukey
+> “The simple graph has brought more information to the data analyst’s mind than any other device.”
+>
+> — John Tukey
 
 This week we will engage with the question of why well-designed data graphics are important and describe a taxonomy for understanding their composition and I will teach you how to visualise your data using ggplot2.
 
@@ -129,17 +131,17 @@ Former *New York Times* intern and [FlowingData.com](https://flowingdata.com/) c
 
     **Table 2.1: Visual cues and what they signify.**
 
-| Visual Cue | Variable Type | Question                                           |
-|:-----------|:--------------|:---------------------------------------------------|
-| Position   | numerical     | where in relation to other things?                 |
-| Length     | numerical     | how big (in one dimension)?                        |
-| Angle      | numerical     | how wide? parallel to something else?              |
-| Direction  | numerical     | at what slope? in a time series, going up or down? |
-| Shape      | categorical   | belonging to which group?                          |
-| Area       | numerical     | how big (in two dimensions)?                       |
-| Volume     | numerical     | how big (in three dimensions)?                     |
-| Shade      | either        | to what extent? how severely?                      |
-| Color      | either        | to what extent? how severely?                      |
+| Visual Cue | Variable Type | Question |
+|:--------------|:--------------|:------------------------------------------|
+| Position | numerical | where in relation to other things? |
+| Length | numerical | how big (in one dimension)? |
+| Angle | numerical | how wide? parallel to something else? |
+| Direction | numerical | at what slope? in a time series, going up or down? |
+| Shape | categorical | belonging to which group? |
+| Area | numerical | how big (in two dimensions)? |
+| Volume | numerical | how big (in three dimensions)? |
+| Shade | either | to what extent? how severely? |
+| Color | either | to what extent? how severely? |
 
 Research into graphical perception (dating back to the mid-1980s) has shown that human beings' ability to perceive differences in magnitude accurately descends in this order (Cleveland and McGill 1984). That is, **humans are quite good at accurately perceiving differences in position (e.g., how much taller one bar is than another), but not as good at perceiving differences in angles.** This is one reason why many people prefer bar charts to [*pie charts*](https://en.wikipedia.org/w/index.php?search=pie%20charts). Our relatively poor ability to perceive differences in color is a major factor in the relatively low opinion of [*heat maps*](https://en.wikipedia.org/w/index.php?search=heat%20maps) that many data scientists have.
 
