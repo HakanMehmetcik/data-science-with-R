@@ -132,7 +132,7 @@ Former *New York Times* intern and [FlowingData.com](https://flowingdata.com/) c
     **Table 2.1: Visual cues and what they signify.**
 
 | Visual Cue | Variable Type | Question |
-|:--------------|:--------------|:------------------------------------------|
+|:-----------------------|:-----------------------|:-----------------------|
 | Position | numerical | where in relation to other things? |
 | Length | numerical | how big (in one dimension)? |
 | Angle | numerical | how wide? parallel to something else? |
@@ -153,7 +153,7 @@ Research into graphical perception (dating back to the mid-1980s) has shown that
 
     -   **Geographic**: The increasingly important system in which we have locations on the curved surface of the Earth, but we are trying to represent these locations in a flat two-dimensional plane.
 
--   **Scale** translate values into visual cues. The choice of scale is often crucial. The central question is *how*does distance in the data graphic translate into meaningful differences in quantity? Each coordinate axis can have its own scale, for which we have three different choices:
+-   **Scale** translate values into visual cues. The choice of scale is often crucial. The central question is *how* does distance in the data graphic translate into meaningful differences in quantity? Each coordinate axis can have its own scale, for which we have three different choices:
 
     -   **Numeric**: A numeric quantity is most commonly set on a *linear*, *logarithmic*, or *percentage* scale. Note that a logarithmic scale does not have the property that, say, a one-centimeter difference in position corresponds to an equal difference in quantity anywhere on the scale.
 
@@ -282,8 +282,8 @@ On occasion, data from more than one data table are graphed together. For exampl
 ChargesNJ <- MedicareCharges |>
   filter(stateProvider == "NJ")
 set.seed(101)
-ChargesNJ %>% 
-  head(10) %>%
+ChargesNJ |> 
+  head(10) |>
   mdsr_table(caption = "Glyph-ready data for the barplot layer.")
 ```
 

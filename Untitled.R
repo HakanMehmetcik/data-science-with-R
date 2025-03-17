@@ -1,17 +1,11 @@
-# veriyi r enviromenta veri başlığı ile ekle
-veri <-mtcars
+library(here)
+path <-"~/Desktop/mac_projects 2/data-science-with-R/data"
 
-# veri başlıklarını yazdır
-names(veri)
+# Load the data
+binary <- read.csv(here(path, "binary.csv"))
 
-# veri başlıklarını değiştir
-names(veri) <- c("araba","mpg","silindir","displacement","hp","drat","wt",
-                 "qsec","vs","am","gear")
+# Display the first few rows of the data
+head(binary)
+tail(binary)
 
-# veri görselleştirme
-library(ggplot2)
-
-ggplot(veri,aes(x=mpg,y=hp)) +
-geom_point() +
-theme_classic()     
-
+binary$admit <- factor(binary$admit)
