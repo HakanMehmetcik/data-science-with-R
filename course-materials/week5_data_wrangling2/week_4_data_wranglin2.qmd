@@ -91,12 +91,12 @@ An inner join keeps observations that appear in both tables. An **outer join** k
 the flights and weather tables match on their common variables: `year`, `month`, `day`, `hour` and `origin`
 
 ```{r}
-flights_joined |> 
+left_joined<- flights_joined |> 
   left_join(weather)
 ```
 
 ```{r}
-flights_joined |> 
+left_joined <- left_joined |> 
   left_join(planes, by="tailnum")
 ```
 
@@ -124,7 +124,7 @@ flights_joined |>
 The inverse of a semi-join is an anti-join. An anti-join keeps the rows that *don’t* have a match. Anti-joins are useful for diagnosing join mismatches. For example, when connecting `flights` and `planes`, you might be interested to know that there are many `flights` that don’t have a match in `planes`:
 
 ```{r}
-flights |> 
+anti_join <- flights |> 
   anti_join(planes, by = "tailnum") |> 
   count(tailnum, sort = TRUE)
 ```

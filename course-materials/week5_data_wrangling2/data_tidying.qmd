@@ -62,7 +62,7 @@ tidyr provides two functions for pivoting data: [`pivot_longer()`](https://tidyr
 The `billboard` dataset records the billboard rank of songs in the year 2000:
 
 ```{r}
-billboard
+billboard <- billboard
 ```
 
 In this dataset, each observation is a song. The first three columns (`artist`, `track` and `date.entered`) are variables that describe the song. Then we have 76 columns (`wk1`-`wk76`) that describe the rank of the song in each week^[1](https://r4ds.hadley.nz/data-tidy#fn1)^. Here, the column names are one variable (the `week`) and the cell values are another (the `rank`).
@@ -96,7 +96,7 @@ After the data, there are three key arguments:
 A more challenging situation occurs when you have multiple pieces of information crammed into the column names, and you would like to store these in separate new variables. For example, take the `who2` dataset, the source of `table1` and friends that you saw above:
 
 ```{r}
-who2
+who2 <- who2
 ```
 
 This dataset, collected by the World Health Organisation, records information about tuberculosis diagnoses. There are two columns that are already variables and are easy to interpret: `country` and `year`. They are followed by 56 columns like `sp_m_014`, `ep_m_4554`, and `rel_m_3544`. If you stare at these columns for long enough, you’ll notice there’s a pattern. Each column name is made up of three pieces separated by `_`. The first piece, `sp`/`rel`/`ep`, describes the method used for the diagnosis, the second piece, `m`/`f` is the `gender` (coded as a binary variable in this dataset), and the third piece, `014`/`1524`/`2534`/`3544`/`4554`/`5564`/`65` is the `age` range (`014` represents 0-14, for example).
