@@ -14,7 +14,7 @@ df-print: kable
 # loaded packages
 library(tidyverse)
 library(here)
-dpath <- "Lectures/week7_exercises"
+dpath <- "~/Desktop/mac_projects 2/data-science-with-R/course-materials/week8_exercises"
 ```
 
 # Exercise 1: Exploring the Data
@@ -123,7 +123,7 @@ We start using pipes with the \|\> pipe operator. This is one of several pipe op
 
 ```{r}
 simd2020 |> 
-  count(Council_area)
+   count(Council_area)
 ```
 
 The output shows the first 10 council areas alphabetically and that there are an additional 22 council areas not shown. Depending on our goal, this might not be very useful. Instead, we often want sort variables by the most or least number of observations. We can do this by adding the option sort=TRUE into the count() function specification.
@@ -137,7 +137,7 @@ This shows that Glasgow City and City of Edinburgh have the most observations in
 
 ## Managing the Missing Values
 
-When reading in data and before we perform statistical analysis, we often need to deal with the missing values in some way. In the next classes, we will look at recoding variables, where we specify certain variable values as missing, but here we will look at dealing with missing values in the aggregate. While we could remove all observations with missing values for any variable in a dataset, this approach often removes more observations than is needed. An alternative approach is to remove observations with missing values only for the specific variables we are using. We can do this with the filter() function from the dplyr package. The filter() function acts just as you imagine - it filters the data based on a set of conditions. Below, we use the is.na() function in the filter() function to remove missing values from the variable Attendance. Since is.na() means ‘is missing’, we actually need to specify that we want to keep observations that are ‘not missing’. To do this, we include ! before is.na(); ! means ‘not’.
+When reading in data and before we perform statistical analysis, we often need to deal with the missing values in some way. In the next session, we will look at recording variables, where we specify certain variable values as missing, but here we will look at dealing with missing values in the aggregate. While we could remove all observations with missing values for any variable in a dataset, this approach often removes more observations than is needed. An alternative approach is to remove observations with missing values only for the specific variables we are using. We can do this with the filter() function from the dplyr package. The filter() function acts just as you imagine - it filters the data based on a set of conditions. Below, we use the is.na() function in the filter() function to remove missing values from the variable Attendance. Since is.na() means ‘is missing’, we actually need to specify that we want to keep observations that are ‘not missing’. To do this, we include ! before is.na(); ! means ‘not’.
 
 ```{r}
 simd2020 |> 

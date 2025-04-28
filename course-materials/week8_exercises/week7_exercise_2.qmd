@@ -14,7 +14,7 @@ df-print: kable
 # loaded packages
 library(tidyverse)
 library(here)
-dpath <- "Lectures/week7_exercises"
+dpath <- "~/Desktop/mac_projects 2/data-science-with-R/course-materials/week8_exercises"
 
 ```
 
@@ -73,8 +73,8 @@ Now, let's use janitor package to clean the names!
 ```{r}
 # install.packages("janitor") 
 library(janitor)
-simd_j <- clean_names(simd2020)
-names(simd_j)
+simd_lc <- clean_names(simd2020)
+names(simd_lc)
 ```
 
 ## Changing Variables’ Classifications
@@ -140,7 +140,7 @@ glimpse(hcrime)
 We immediately see another problem - several variables have \r\n in their names, which indicates a ‘new line’ in a Microsoft Office document. We could remove these characters after we read-in the data, but an easier solution is to use the option .name_repair = "universal" in the read_xlsx() function.
 
 ```{r}
-hcrime <- read_xlsx(here(dpath, "2020_HateCrime_Location.xlsx"), skip = 5, .name_repair = "universal")
+hcrime1 <- read_xlsx(here(dpath, "2020_HateCrime_Location.xlsx"), skip = 5, .name_repair = "universal")
 glimpse(hcrime)
 ```
 

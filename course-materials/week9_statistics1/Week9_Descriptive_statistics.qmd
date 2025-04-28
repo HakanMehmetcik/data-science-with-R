@@ -15,13 +15,13 @@ here <- here::here()
 dpath <- "data"
 ```
 
-# Week 3: Descriptive Statistics
+# Week 8: Descriptive Statistics
 
 ## **Learning Objectives:**
 
 By the end of this chapter, students should be able to:
 
-1.  **Calculate Measures of Central Location: Mean and Median:**
+1.  **Calculate Measures of Centrality: Mean and Median:**
 
     -   Define the mean (average) and median as measures of central location.
 
@@ -47,18 +47,16 @@ By the end of this chapter, students should be able to:
 
 Here is a quick falshback: Different data types and the possible visual tools to represent them:
 
-| **Data Type**   | **Visual Tool**      | **Description**                                               |
-|-----------------|----------------------|---------------------------------------------------------------|
-| Categorical     | Bar Plot             | Displays the frequency or count of each category.             |
-| Categorical     | Pie Chart            | Shows the proportions or percentages of each category.        |
-| Categorical     | Stacked Bar Plot     | Compares the distribution of subcategories within categories. |
-| Numeric         | Histogram            | Represents the distribution of numeric values in intervals.   |
-| Numeric         | Box Plot             | Displays the summary statistics and identifies outliers.      |
-| Numeric         | Density Plot         | Shows the probability density function of the data.           |
-| Numeric         | Scatter Plot         | Depicts the relationship between two numeric variables.       |
-| Time Series     | Time Series Plot     | Visualizes data collected over time, such as stock prices.    |
-| Geographic      | Scatter Plot on Maps | Maps data points with geographic coordinates.                 |
-| Textual/Nominal | Word Cloud           | Highlights word frequency in textual data.                    |
+| **Data Type** | **Visual Tool** | **Description** |
+|----------------|----------------|-----------------------------------------|
+| Categorical | Bar Plot | Displays the frequency or count of each category. |
+| Categorical | Pie Chart | Shows the proportions or percentages of each category. |
+| Categorical | Stacked Bar Plot | Compares the distribution of subcategories within categories. |
+| Numeric | Histogram | Represents the distribution of numeric values in intervals. |
+| Numeric | Box Plot | Displays the summary statistics and identifies outliers. |
+| Numeric | Density Plot | Shows the probability density function of the data. |
+| Numeric | Scatter Plot | Depicts the relationship between two numeric variables. |
+| Time Series | Time Series Plot | Visualizes data collected over time, such as stock prices. |
 
 These are some common data types and the corresponding visualization tools frequently used in data analysis. The choice of visualization method depends on the nature of your data and the insights you want to convey.
 
@@ -66,7 +64,7 @@ These are some common data types and the corresponding visualization tools frequ
 
 Let's recall that statistics is to help us answer questions from the data. Population and parameter as information about the population is generally unknown. In order to estimate these parameters, we need our sample, whether from a designed experiment or observational study. But just like we cannot use entire sample, we have to rely on appropriately chosen summary number of the sample to estimate our parameters. This is statistic, or any number calculated from our sample.
 
-**To begin with, you have to find a way to summarize the data, that is what descriptive statistics is all about.** Further, we cannot---or should not---make definitive decisions from descriptive statistics. Rather, descriptive statistics can give us a general idea what is going on in the dataset and point us in the direction of interesting relationships between variables in the dataset.
+**To begin with, you have to find a way to summarize the data, that is what descriptive statistics is all about.** Further, we cannot-or should not-make definitive decisions from descriptive statistics. Rather, descriptive statistics can give us a general idea what is going on in the dataset and point us in the direction of interesting relationships between variables in the dataset.
 
 ## Descriptive Statistics with Categorical Variables
 
@@ -158,16 +156,9 @@ This code creates a data frame **`my_table`** where each row corresponds to a ra
 You can now perform various analyses and calculations using this data frame, such as calculating proportions, conducting chi-squared tests, or creating visualizations to explore the relationships between racial/ethnic groups and their preferences or responses in different categories.
 
 ```{r}
-prop.table(my_table)
+# convert to matrix (or as.table()) before adding margins
+prop.table(addmargins(as.matrix(my_table)))
 ```
-
-Let's break down what each line of code does:
-
-1.  This line calculates the row sums for each row in the data frame and stores the result in a new column called "rowsum" in **`my_table`**. Each element in the "rowsum" column represents the sum of counts for each racial/ethnic group.
-
-2.  This line calculates the column sums for each column in the data frame and adds a new row labeled "colsum" to **`my_table`**. Each element in the "colsum" row represents the sum of counts for each category across all racial/ethnic groups.
-
-With the help of pro.table() function, **`my_table`** data frame will include row sums in the "rowsum" column and column sums in the "colsum" row. This is called as "a contigency table" and can be useful for various analyses and calculations, such as calculating proportions, percentages, or conducting statistical tests to explore the relationships between categories and groups.
 
 Overall, a contingency table, also known as a cross-tabulation or crosstab, is a table used in statistics to summarize and display the relationship between two or more categorical variables. It provides a way to analyze and visualize how the categories of one variable are distributed across the categories of another variable. Contingency tables are particularly useful for understanding the association, dependence, or independence between categorical variables.
 
