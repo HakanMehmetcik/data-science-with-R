@@ -48,7 +48,7 @@ By the end of this chapter, students should be able to:
 Here is a quick falshback: Different data types and the possible visual tools to represent them:
 
 | **Data Type** | **Visual Tool** | **Description** |
-|----------------|----------------|-----------------------------------------|
+|----|----|----|
 | Categorical | Bar Plot | Displays the frequency or count of each category. |
 | Categorical | Pie Chart | Shows the proportions or percentages of each category. |
 | Categorical | Stacked Bar Plot | Compares the distribution of subcategories within categories. |

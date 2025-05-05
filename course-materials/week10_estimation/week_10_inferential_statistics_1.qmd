@@ -40,13 +40,9 @@ Examples of discrete random variables include the number of children in a famil
 
 The mass, temperature, energy, speed, length, and so on are all examples of continuous variables.
 
-**A probability Distribution** is a summary of a random variable that gives all possible values of the random variable along with their probability of occurring.
-
-![](images/Discrete-and-continuous-random-variables.png)
+**A probability Distribution** is a summary of a random variable that gives all possible values of the random variable along with their probability of occurring.💡 The **Binomial** and **Gaussian** (also known as the normal distribution) are both important probability distributions in statistics, but they are used in different situations and have distinct properties. Let’s explore them in simple terms.
 
 ::: callout-note
-💡 The **Binomial** and **Gaussian** (also known as the normal distribution) are both important probability distributions in statistics, but they are used in different situations and have distinct properties. Let’s explore them in simple terms.
-
 ### **Binomial Distribution**
 
 **Imagine you're flipping a coin.** Each flip has two possible outcomes - heads or tails. If you were to flip this coin several times, keeping track of how often it lands heads, you're dealing with a situation that can be described by a binomial distribution.
@@ -88,8 +84,6 @@ Each of these distributions helps in understanding different kinds of data sets 
 
 ## R has a function for
 
-![](images/Screenshot%202022-12-06%20at%2022.23.51.png)
-
 ## Why is The Normal Distribution (Gaussian Distribution) so important?
 
 Normal distribution is one of the most important distribution in statistics. Normal distribution is known as "the bell curve"! That is, the normal distribution is symmetric, uni modal, and it is a distribution for numeric continuous variable.
@@ -100,13 +94,7 @@ In normal distribution there are two parameters:
 
 -   the variance (or sd) (defines the spread)
 
-The area **under the curve** tells you the probability that an observation falls within a particular range. The solid lines plot normal distributions with mean μ " 0 and standard deviation σ " 1. The shaded areas illustrate "areas under the curve" for two important cases. In panel a, we can see that there is a 68.3% chance that an observation will fall within one standard deviation of the mean. In panel b, we see that there is a 95.4% chance that an observation will fall within two standard deviations of the mean.
-
-![](images/Screenshot%202022-12-06%20at%2022.41.15.png)
-
-![](images/Screenshot%202022-12-06%20at%2022.41.44.png)
-
-## Sampling Distributions
+The area **under the curve** tells you the probability that an observation falls within a particular range. The solid lines plot normal distributions with mean μ " 0 and standard deviation σ " 1. The shaded areas illustrate "areas under the curve" for two important cases. In panel a, we can see that there is a 68.3% chance that an observation will fall within one standard deviation of the mean. In panel b, we see that there is a 95.4% chance that an observation will fall within two standard deviations of the mean.Sampling Distributions
 
 In almost every situation of interest, what we have available to us as researchers is a sample of data. We might have run experiment with some number of participants; a polling company might have phoned some number of people to ask questions about voting intentions; etc. Regardless: the data set available to us is finite, and incomplete.
 
